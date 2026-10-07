@@ -1,0 +1,27 @@
+name: Check iPhone and Android web screens
+on:
+  push:
+    branches: [qa/berry-design]
+permissions:
+  contents: read
+jobs:
+  screens:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser check tools
+        run: |
+          npm install --prefix /tmp/liftlog-qa --no-package-lock playwright
+          /tmp/liftlog-qa/node_modules/.bin/playwright install --with-deps chromium webkit
+      - name: Check Safari and Android screens
+        env:
+          NODE_PATH: /tmp/liftlog-qa/node_modules
+        run: node tests/pwa-ui.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Berry-Club-Screens
+          path: ui-results
