@@ -1,0 +1,38 @@
+name: iOS Native Build
+on:
+  push:
+    branches: [main, master]
+    paths: ['ios/**', '.github/workflows/ios-native.yml']
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate Xcode project
+        run: |
+          brew install xcodegen
+          cd ios
+          xcodegen generate
+      - name: Build native app and WidgetKit extension
+        run: xcodebuild -project ios/Liftlog.xcodeproj -scheme Liftlog -sdk iphonesimulator -configuration Debug -derivedDataPath build/full CODE_SIGNING_ALLOWED=NO build
+      - name: Build Personal Team version for simulator
+        run: xcodebuild -project ios/Liftlog.xcodeproj -scheme LiftlogPersonal -sdk iphonesimulator -configuration Debug -derivedDataPath build/personal CODE_SIGNING_ALLOWED=NO build
+      - name: Verify device compilation without signing
+        run: xcodebuild -project ios/Liftlog.xcodeproj -scheme LiftlogPersonal -sdk iphoneos -configuration Release -derivedDataPath build/device CODE_SIGNING_ALLOWED=NO build
+      - name: Launch standalone app in iPhone simulator
+        run: |
+          DEVICE=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(x["udid"] for arr in d["devices"].values() for x in arr if "iPhone" in x["name"]))')
+          xcrun simctl boot "$DEVICE" || true
+          xcrun simctl bootstatus "$DEVICE" -b
+          xcrun simctl install "$DEVICE" build/personal/Build/Products/Debug-iphonesimulator/LiftlogPersonal.app
+          xcrun simctl launch "$DEVICE" kr.liftlog.app.ios
+          sleep 10
+          xcrun simctl io "$DEVICE" screenshot ios-native-preview.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Liftlog-iOS-Source-and-Simulator
+          path: |
+            ios/
+            build/personal/Build/Products/Debug-iphonesimulator/LiftlogPersonal.app/
+            ios-native-preview.png
