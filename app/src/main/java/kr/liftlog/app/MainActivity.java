@@ -19,10 +19,10 @@ public class MainActivity extends Activity {
     private String exportData;
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
-        getWindow().setStatusBarColor(Color.rgb(17,21,30));
-        getWindow().setNavigationBarColor(Color.rgb(17,21,30));
+        getWindow().setStatusBarColor(Color.rgb(255,247,250));
+        getWindow().setNavigationBarColor(Color.rgb(255,247,250));
         web = new WebView(this);
-        web.setBackgroundColor(Color.rgb(17,21,30));
+        web.setBackgroundColor(Color.rgb(255,247,250));
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
         web.getSettings().setJavaScriptEnabled(true);
         web.getSettings().setDomStorageEnabled(true);
