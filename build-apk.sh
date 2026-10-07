@@ -11,5 +11,5 @@ if [[ -z "${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}" && ! -f local.properties ]]; t
 fi
 gradle --no-daemon :app:assembleDebug
 mkdir -p dist
-cp app/build/outputs/apk/debug/app-debug.apk dist/Liftlog-1.0.0.apk
-echo '설치 파일: dist/Liftlog-1.0.0.apk'
+cp app/build/outputs/apk/debug/app-debug.apk dist/Liftlog-1.1.0.apk
+echo '설치 파일: dist/Liftlog-1.1.0.apk'
