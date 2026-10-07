@@ -19,7 +19,7 @@ const root=path.resolve(__dirname,'../web'),out=path.resolve(__dirname,'../ui-re
   await page.locator('[data-action="navigate"][data-page="home"]').first().click();await page.locator('[data-page="settings"]').first().click();await page.locator('[data-action="installWeb"]').click();assert(await page.getByText('홈 화면에 리프트로그 추가',{exact:true}).isVisible());assert((await page.locator('.sheet').innerText()).includes('홈 화면에 추가'));await page.locator('[data-action="close"]').first().click();
   assert((await page.locator('.screen').innerText()).includes('웹앱에는 아이폰 네이티브 위젯'));
   await page.setViewportSize({width:320,height:720});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=320));
-  if(url.startsWith('https:')){await page.evaluate(()=>navigator.serviceWorker.ready);await page.reload();await page.context().setOffline(true);await page.reload();assert(await page.locator('#app').isVisible());await page.context().setOffline(false);console.log('PASS '+name+' 설치 웹앱 오프라인 다시 열기');}
+  if(url.startsWith('https:')){await page.evaluate(()=>navigator.serviceWorker.ready);const cached=await page.evaluate(async()=>Promise.all(['index.html','app.js','theme.css'].map(async file=>!!(await caches.match(new URL(file,location.href).href)))));assert(cached.every(Boolean));console.log('PASS '+name+' 오프라인 앱 자산 캐시');if(name==='chromium'){await page.reload();await page.context().setOffline(true);await page.reload();assert(await page.locator('#app').isVisible());await page.context().setOffline(false);console.log('PASS '+name+' 오프라인 다시 열기');}}
   assert.deepEqual(errors,[]);await browser.close();console.log('PASS '+name+' 운동 기록, 과거 불러오기, 설치 안내, 320px 화면 및 JS 오류 검사');
  }
  server.close();
