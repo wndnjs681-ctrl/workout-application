@@ -2,7 +2,7 @@
 
 한국어 운동 기록 안드로이드 앱. 네이비와 라임색 디자인, 회원가입 없는 기기 저장 방식.
 
-**현재 배포 상태:** 앱 및 안드로이드 프로젝트 소스는 구현했습니다. 이 작업 환경에 Android SDK / Gradle이 없으며 SDK 다운로드와 브라우저 실행도 제한되어 APK 컴파일, 실기기 설치, 실제 위젯 작동 검증은 하지 못했습니다. ZIP은 설치 APK가 아닌 소스 프로젝트입니다.
+**현재 배포 상태:** GitHub Actions에서 Android APK 컴파일, 핵심 데이터 로직 검사, APK v2 서명 검사까지 통과했습니다. [APK 다운로드](https://github.com/wndnjs681-ctrl/workout-application/actions/runs/37571667657/artifacts/11461630303)에서 ZIP을 내려받아 압축을 풀고 `Liftlog-1.0.0.apk`를 설치하세요. GitHub 로그인이 필요하고 이 파일은 2026년 11월 6일까지 보관됩니다. 실기기 설치와 실제 위젯 작동은 아직 검증하지 않았습니다.
 
 ## 포함한 기능
 
@@ -37,7 +37,7 @@ JDK 17 이상, Android SDK 35, Gradle 8.11.1을 설치하고 `ANDROID_HOME`을 S
 
 방법 3 — GitHub Actions:
 
-소스를 본인의 GitHub 저장소에 올리면 포함된 `.github/workflows/android.yml`이 main/master push 또는 수동 실행 때 SDK를 설치하고 APK를 빌드합니다. Actions → Build installable APK → 완료된 실행 → Artifacts의 `Liftlog-1.0.0-APK`를 다운로드하여 압축을 풀면 `app-debug.apk`가 있습니다. 워크플로는 작성했지만 여기서는 원격 실행하지 않았습니다.
+소스를 본인의 GitHub 저장소에 올리면 포함된 `.github/workflows/android.yml`이 main/master push 또는 수동 실행 때 SDK를 설치하고 APK를 빌드합니다. Actions → Build installable APK → 완료된 실행 → Artifacts의 `Liftlog-1.0.0-APK`를 다운로드하여 압축을 풀면 `app-debug.apk`가 있습니다. [실제 성공한 빌드](https://github.com/wndnjs681-ctrl/workout-application/actions/runs/37571667657)를 확인할 수 있습니다.
 
 생성되는 APK는 개발용 debug 서명입니다. 같은 앱을 계속 업데이트하려면 같은 서명 키를 유지해야 합니다. 스토어 배포에는 별도 release 서명과 AAB 빌드가 필요하며, 스토어 등록은 수행하지 않았습니다.
 
@@ -51,7 +51,7 @@ JDK 17 이상, Android SDK 35, Gradle 8.11.1을 설치하고 `ANDROID_HOME`을 S
 
 `node tests/core.cjs`: 루틴 구성, 저장, 단위 변환과 원본 보존, 세트 볼륨, 타이머 상태, 완료한 세트 저장, 캘린더 데이터, 백업 검증·오류 거부, 위젯 JS 호출 경로, 운동 취소, 진행 기록 복구와 화면 HTML 생성 검증 통과.
 
-JavaScript 문법 검사, 11개 Android manifest / 리소스 XML 파싱, 빌드 스크립트 문법 검사 통과. `tests/flow.cjs`는 Playwright 실제 UI 검증 시나리오이며, 이 환경에서는 Chromium의 소켓 호출이 차단되어 실행하지 못했습니다. Android Java 컴파일과 SDK 호환성, 네이티브 알림 / 위젯 / 파일 선택기, 실기기 화면 및 접근성 검증은 APK 빌드 이후 필요합니다.
+JavaScript 문법 검사, 11개 Android manifest / 리소스 XML 파싱, 빌드 스크립트 문법 검사 통과. `tests/flow.cjs`는 Playwright 실제 UI 검증 시나리오이며, 이 환경에서는 Chromium의 소켓 호출이 차단되어 실행하지 못했습니다. GitHub Actions에서 Android Java 컴파일, SDK 35 빌드 및 APK 서명 검증을 통과했습니다. 네이티브 알림 / 위젯 / 파일 선택기, 실기기 화면 및 접근성 검증은 남아 있습니다.
 
 ## 참고한 앱
 
