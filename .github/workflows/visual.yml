@@ -19,6 +19,7 @@ jobs:
       - name: Check Safari and Android screens
         env:
           NODE_PATH: /tmp/liftlog-qa/node_modules
+          LIFTLOG_PWA_URL: https://wndnjs681-ctrl.github.io/workout-application/
         run: node tests/pwa-ui.cjs
       - uses: actions/upload-artifact@v4
         if: always()
