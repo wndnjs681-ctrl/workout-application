@@ -6,6 +6,8 @@ on:
 jobs:
   apk:
     runs-on: ubuntu-latest
+    env:
+      LIFTLOG_DEBUG_KEYSTORE: ${{ github.workspace }}/.signing/debug.keystore
     permissions:
       contents: read
     steps:
@@ -23,8 +25,15 @@ jobs:
           gradle-version: '8.11.1'
       - uses: actions/cache@v4
         with:
-          path: ~/.android/debug.keystore
-          key: liftlog-debug-signing-v1
+          path: ${{ env.LIFTLOG_DEBUG_KEYSTORE }}
+          key: liftlog-explicit-debug-signing-v1
+      - name: Ensure persistent signing key
+        run: |
+          mkdir -p .signing
+          if [ ! -f "$LIFTLOG_DEBUG_KEYSTORE" ]; then
+            keytool -genkeypair -keystore "$LIFTLOG_DEBUG_KEYSTORE" -storepass android -keypass android -alias androiddebugkey -dname "CN=Android Debug,O=Android,C=US" -keyalg RSA -keysize 2048 -validity 10000 -noprompt
+          fi
+          test -s "$LIFTLOG_DEBUG_KEYSTORE"
       - name: Check workout data logic
         run: node tests/core.cjs
       - name: Install SDK
