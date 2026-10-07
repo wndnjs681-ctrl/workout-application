@@ -1,0 +1,1 @@
+<data-extraction-rules><cloud-backup><include domain="sharedpref" path="liftlog.xml"/></cloud-backup><device-transfer><include domain="sharedpref" path="liftlog.xml"/></device-transfer></data-extraction-rules>
