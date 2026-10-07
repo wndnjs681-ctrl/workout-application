@@ -1,8 +1,18 @@
 # 리프트로그 · LIFTLOG
 
-한국어 운동 기록 안드로이드 앱. 네이비와 라임색 디자인, 회원가입 없는 기기 저장 방식.
+한국어 운동 기록 안드로이드 앱. 딸기 우유색 배경과 베리색 버튼의 둥근 디자인, 회원가입 없는 기기 저장 방식.
 
-**현재 배포 상태:** GitHub Actions에서 Android APK 컴파일, 핵심 데이터 로직 검사, APK v2 서명 검사까지 통과했습니다. [APK 다운로드](https://github.com/wndnjs681-ctrl/workout-application/actions/runs/37573272092/artifacts/11461896556)에서 ZIP을 내려받아 압축을 풀고 `Liftlog-1.1.0.apk`를 설치하세요. GitHub 로그인이 필요하고 이 파일은 2026년 11월 6일까지 보관됩니다. 실기기 설치와 실제 위젯 작동은 아직 검증하지 않았습니다.
+**현재 배포 상태:** GitHub Actions에서 Android APK 컴파일, 핵심 데이터 로직 검사, APK v2 서명 검사까지 통과했습니다. [APK 다운로드](https://github.com/wndnjs681-ctrl/workout-application/actions/runs/37577328253/artifacts/11463490777)에서 ZIP을 내려받아 압축을 풀고 `Liftlog-1.2.0.apk`를 설치하세요. GitHub 로그인이 필요하고 이 파일은 2026년 11월 6일까지 보관됩니다. 실기기 설치와 실제 위젯 작동은 아직 검증하지 않았습니다.
+
+## 1.2.0 — 귀여운 디자인과 아이폰 설치형 웹앱
+
+[아이폰용 리프트로그 열기](https://wndnjs681-ctrl.github.io/workout-application/)
+
+아이폰에서 Safari로 링크를 열고 공유 → 홈 화면에 추가 → 추가를 선택하세요. 홈 화면 아이콘으로 앱처럼 사용할 수 있으며, 첫 온라인 준비 이후에는 오프라인에서도 화면과 기기에 저장된 기록을 사용할 수 있습니다. 웹앱은 App Store 앱이나 IPA 설치 파일이 아닙니다. 아이폰 네이티브 위젯과 잠금 화면의 타이머 완료 알림은 지원하지 않으며, 앱을 다시 열면 실제 남은 시간을 계산합니다. 웹앱 기록은 각 브라우저·기기에 저장됩니다. 기기나 플랫폼을 옮길 때는 백업 저장 → 복원을 사용하세요.
+
+공유 디자인: 딸기 우유색 배경, 베리색 버튼, 파스텔 분홍·보라·살구색 카드, 하트 브랜드 아이콘. 안드로이드 네이티브 위젯과 상태 표시줄도 같은 색으로 변경했습니다. 글씨 확대를 지원하도록 viewport의 확대 제한을 제거했습니다.
+
+안드로이드 1.1.0과 1.2.0은 서명 인증서가 동일하므로 앱을 삭제하지 않고 1.2.0을 설치하면 기존 기록이 유지됩니다. 최초 1.0.0에서 바로 옮기는 경우에는 아래 백업 이전 절차가 필요합니다.
 
 ## 1.1.0 — 과거 운동 불러오기
 
@@ -45,7 +55,7 @@ JDK 17 이상, Android SDK 35, Gradle 8.11.1을 설치하고 `ANDROID_HOME`을 S
 
 방법 3 — GitHub Actions:
 
-소스를 본인의 GitHub 저장소에 올리면 포함된 `.github/workflows/android.yml`이 main/master push 또는 수동 실행 때 SDK를 설치하고 APK를 빌드합니다. Actions → Build installable APK → 완료된 실행 → Artifacts의 `Liftlog-1.0.0-APK`를 다운로드하여 압축을 풀면 `app-debug.apk`가 있습니다. [실제 성공한 빌드](https://github.com/wndnjs681-ctrl/workout-application/actions/runs/37573272092)를 확인할 수 있습니다.
+소스를 본인의 GitHub 저장소에 올리면 포함된 `.github/workflows/android.yml`이 main/master push 또는 수동 실행 때 SDK를 설치하고 APK를 빌드합니다. Actions → Build installable APK → 완료된 실행 → Artifacts의 `Liftlog-1.0.0-APK`를 다운로드하여 압축을 풀면 `app-debug.apk`가 있습니다. [실제 성공한 빌드](https://github.com/wndnjs681-ctrl/workout-application/actions/runs/37577328253)를 확인할 수 있습니다.
 
 생성되는 APK는 개발용 debug 서명입니다. 같은 앱을 계속 업데이트하려면 같은 서명 키를 유지해야 합니다. 스토어 배포에는 별도 release 서명과 AAB 빌드가 필요하며, 스토어 등록은 수행하지 않았습니다.
 
