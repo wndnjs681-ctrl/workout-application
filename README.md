@@ -4,6 +4,10 @@
 
 **현재 배포 상태:** GitHub Actions에서 Android APK 컴파일, 핵심 데이터 로직 검사, APK v2 서명 검사까지 통과했습니다. [APK 다운로드](https://github.com/wndnjs681-ctrl/workout-application/actions/runs/37577328253/artifacts/11463490777)에서 ZIP을 내려받아 압축을 풀고 `Liftlog-1.2.0.apk`를 설치하세요. GitHub 로그인이 필요하고 이 파일은 2026년 11월 6일까지 보관됩니다. 실기기 설치와 실제 위젯 작동은 아직 검증하지 않았습니다.
 
+## iOS 단독 앱
+
+Safari 없이 실행되는 iOS 프로젝트는 [ios/README.md](ios/README.md)에 있습니다. 운동 화면을 앱에 포함하고 iOS 파일 백업, 로컬 타이머 알림, WidgetKit 위젯을 연결했습니다. Mac과 무료 Apple ID가 있으면 `LiftlogPersonal` 스킴으로 본인 기기에서 임시 테스트할 수 있습니다. 위젯이 포함된 `Liftlog` 스킴과 TestFlight/App Store 배포에는 Apple Developer Program 계정 및 서명이 필요합니다. GitHub Actions의 서명 없는 빌드·시뮬레이터 파일은 아이폰에 직접 설치할 수 있는 IPA가 아닙니다.
+
 ## 1.2.0 — 귀여운 디자인과 아이폰 설치형 웹앱
 
 [아이폰용 리프트로그 열기](https://wndnjs681-ctrl.github.io/workout-application/)
