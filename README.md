@@ -2,7 +2,7 @@
 
 한국어 운동 기록 안드로이드 앱. 네이비와 라임색 디자인, 회원가입 없는 기기 저장 방식.
 
-**현재 배포 상태:** GitHub Actions에서 Android APK 컴파일, 핵심 데이터 로직 검사, APK v2 서명 검사까지 통과했습니다. [APK 다운로드](https://github.com/wndnjs681-ctrl/workout-application/actions/runs/37571667657/artifacts/11461630303)에서 ZIP을 내려받아 압축을 풀고 `Liftlog-1.0.0.apk`를 설치하세요. GitHub 로그인이 필요하고 이 파일은 2026년 11월 6일까지 보관됩니다. 실기기 설치와 실제 위젯 작동은 아직 검증하지 않았습니다.
+**현재 배포 상태:** GitHub Actions에서 Android APK 컴파일, 핵심 데이터 로직 검사, APK v2 서명 검사까지 통과했습니다. [APK 다운로드](https://github.com/wndnjs681-ctrl/workout-application/actions/runs/37573272092/artifacts/11461896556)에서 ZIP을 내려받아 압축을 풀고 `Liftlog-1.1.0.apk`를 설치하세요. GitHub 로그인이 필요하고 이 파일은 2026년 11월 6일까지 보관됩니다. 실기기 설치와 실제 위젯 작동은 아직 검증하지 않았습니다.
 
 ## 1.1.0 — 과거 운동 불러오기
 
@@ -45,7 +45,7 @@ JDK 17 이상, Android SDK 35, Gradle 8.11.1을 설치하고 `ANDROID_HOME`을 S
 
 방법 3 — GitHub Actions:
 
-소스를 본인의 GitHub 저장소에 올리면 포함된 `.github/workflows/android.yml`이 main/master push 또는 수동 실행 때 SDK를 설치하고 APK를 빌드합니다. Actions → Build installable APK → 완료된 실행 → Artifacts의 `Liftlog-1.0.0-APK`를 다운로드하여 압축을 풀면 `app-debug.apk`가 있습니다. [실제 성공한 빌드](https://github.com/wndnjs681-ctrl/workout-application/actions/runs/37571667657)를 확인할 수 있습니다.
+소스를 본인의 GitHub 저장소에 올리면 포함된 `.github/workflows/android.yml`이 main/master push 또는 수동 실행 때 SDK를 설치하고 APK를 빌드합니다. Actions → Build installable APK → 완료된 실행 → Artifacts의 `Liftlog-1.0.0-APK`를 다운로드하여 압축을 풀면 `app-debug.apk`가 있습니다. [실제 성공한 빌드](https://github.com/wndnjs681-ctrl/workout-application/actions/runs/37573272092)를 확인할 수 있습니다.
 
 생성되는 APK는 개발용 debug 서명입니다. 같은 앱을 계속 업데이트하려면 같은 서명 키를 유지해야 합니다. 스토어 배포에는 별도 release 서명과 AAB 빌드가 필요하며, 스토어 등록은 수행하지 않았습니다.
 
