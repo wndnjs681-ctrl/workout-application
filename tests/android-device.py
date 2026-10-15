@@ -55,6 +55,7 @@ x1,y1,x2,y2=map(int,re.findall(r'\d+',node.attrib['bounds']))
 adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2))
 wait(lambda:'mInputShown=true' in adb('shell','dumpsys','input_method') or 'mIsInputViewShown=true' in adb('shell','dumpsys','input_method'))
 wait(lambda:js('innerHeight')<base_height-100,seconds=30)
+time.sleep(1)  # Wait for the WebView compositor and IME animation to finish.
 size=js("JSON.stringify({h:innerHeight,button:document.querySelector('#picker-add').getBoundingClientRect().bottom,search:document.querySelector('#exercise-search').getBoundingClientRect().top,list:document.querySelector('.picker-list').clientHeight})")
 size=json.loads(size);assert size['button']<=size['h']+1 and size['search']>=0 and size['list']>10,size
 shot('android-keyboard-search.png');print('PASS actual Android keyboard keeps search and add button visible',size)
@@ -68,6 +69,6 @@ adb('shell','cmd','statusbar','collapse');adb('shell','input','keyevent','3');ti
 # Confirm foreground timer survives leaving the activity.
 assert 'RestTimerService' in adb('shell','dumpsys','activity','services','kr.liftlog.app')
 print('PASS native foreground countdown and custom notification while app is in background')
-adb('shell','input','keyevent','26');time.sleep(2);adb('shell','input','keyevent','26');time.sleep(2);shot('android-lockscreen-countdown.png')
+adb('shell','locksettings','set-disabled','false');adb('shell','input','keyevent','26');time.sleep(2);adb('shell','input','keyevent','26');time.sleep(2);shot('android-lockscreen-countdown.png')
 (out/'android-native-verification.txt').write_text('PASS actual keyboard viewport\nPASS foreground timer notification in background\nNotification and lock-screen screenshots captured; display depends on device notification settings.\n')
 ws.close()
