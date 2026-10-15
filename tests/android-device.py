@@ -9,8 +9,9 @@ def wait(check,seconds=30):
  while time.time()<end:
   try:
    value=check()
-   if value:return value
-  except Exception:pass
+   if value is not None and value is not False and value != "":return value
+  except Exception as error:
+   print("Waiting:",str(error)[:180],flush=True)
   time.sleep(.5)
  raise AssertionError('Timed out waiting for device state')
 adb('install','-r','dist/Liftlog-1.3.0.apk')
@@ -35,13 +36,19 @@ def shot(name):
 print('CDP target',target,flush=True)
 print('Initial page',js("JSON.stringify({url:location.href,text:document.body?.innerText,ready:document.readyState,actions:typeof actions})"),flush=True)
 shot('android-initial.png')
-wait(lambda:js("typeof actions==='object'"))
+wait(lambda:js("typeof actions==='object'"),seconds=60)
 assert js('library.length')==294
 js('actions.start()');time.sleep(1)
 # Tap the real accessibility node, so Android opens its actual input method.
-adb('shell','uiautomator','dump','/sdcard/liftlog-ui.xml')
-xml=adb('shell','cat','/sdcard/liftlog-ui.xml');root=ET.fromstring(xml)
-node=next(n for n in root.iter('node') if n.attrib.get('class')=='android.widget.EditText')
+shot('android-picker-before-keyboard.png')
+def find_input():
+ result=adb('shell','uiautomator','dump','/sdcard/liftlog-ui.xml')
+ print('Accessibility dump:',result,flush=True)
+ if 'dumped' not in result:return None
+ xml=adb('shell','cat','/sdcard/liftlog-ui.xml')
+ root=ET.fromstring(xml)
+ return next((n for n in root.iter('node') if n.attrib.get('class')=='android.widget.EditText'),None)
+node=wait(find_input,seconds=60)
 x1,y1,x2,y2=map(int,re.findall(r'\d+',node.attrib['bounds']))
 adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2))
 wait(lambda:'mInputShown=true' in adb('shell','dumpsys','input_method') or 'mIsInputViewShown=true' in adb('shell','dumpsys','input_method'))

@@ -38,6 +38,6 @@ const server=http.createServer((req,res)=>{const file=path.join(root,new URL(req
  await click('timerStop');await page.screenshot({path:path.join(output,'upgrade-workout.png'),fullPage:true});
  await page.reload();assert.equal((await state()).draft.exercises[0].sets.length,7);pass('업데이트 세트 재실행 복구');
  await page.setViewportSize({width:320,height:720});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=320));pass('320px 화면 가로 넘침 없음');
- await click('pick');await page.screenshot({path:path.join(output,'upgrade-picker.png')});
+ await click('pick');await page.waitForTimeout(300);await page.screenshot({path:path.join(output,'upgrade-picker.png')});
  assert.deepEqual(errors,[]);pass('브라우저 오류 없음');await browser.close();server.close();
 })().catch(e=>{console.error(e);server.close();process.exit(1)});
