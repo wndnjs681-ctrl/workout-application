@@ -559,14 +559,14 @@ document.addEventListener('focusout',event=>{const el=event.target;if(el.dataset
 document.addEventListener('pointerdown',event=>{
  const row=event.target.closest?.('.set-row');
  if(openSwipe&&(!row||row!==openSwipe)){openSwipe.style.transform='';openSwipe=null;}
- if(!row||event.target.closest('button')||(event.target.matches?.('input')&&event.target===document.activeElement)||event.isPrimary===false)return;
+ if(!row||event.target.closest('button')||event.isPrimary===false)return;
  swipeGesture={row,x:event.clientX,y:event.clientY,active:false};
 });
 document.addEventListener('pointermove',event=>{
  const g=swipeGesture;if(!g)return;const dx=event.clientX-g.x,dy=event.clientY-g.y;
  if(!g.active&&Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){swipeGesture=null;return;}
  if(dx < -12 && Math.abs(dx)>Math.abs(dy)*1.3)g.active=true;
- if(g.active){event.preventDefault();g.row.style.transform=`translateX(${Math.max(-104,Math.min(0,dx))}px)`;}
+ if(g.active){event.preventDefault();g.row.setPointerCapture?.(event.pointerId);g.row.style.transform=`translateX(${Math.max(-104,Math.min(0,dx))}px)`;}
 },{passive:false});
 function endSwipe(event){const g=swipeGesture;swipeGesture=null;if(!g)return;if(g.active&&event.clientX-g.x < -48){g.row.style.transform='translateX(-96px)';openSwipe=g.row;document.activeElement?.blur?.();}else g.row.style.transform='';}
 document.addEventListener('pointerup',endSwipe);

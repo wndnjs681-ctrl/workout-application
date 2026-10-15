@@ -27,8 +27,9 @@ const server=http.createServer((req,res)=>{const file=path.join(root,new URL(req
  await reps.click();await page.keyboard.type('8');assert.equal(await reps.inputValue(),'8');pass('기존 숫자를 지우지 않고 덮어쓰기');
  await click('addSet');assert.equal((await state()).draft.exercises[0].sets.length,4);assert.equal((await state()).draft.exercises[0].sets[3].weightKg,40);pass('한 번 눌러 이전 세트 복사 추가');
  await click('addThreeSets');assert.equal((await state()).draft.exercises[0].sets.length,7);pass('3세트 빠른 추가');
- await page.evaluate(()=>document.activeElement.blur());await weight.scrollIntoViewIfNeeded();
+ await page.evaluate(()=>document.activeElement.blur());await weight.evaluate(el=>el.scrollIntoView({block:'center'}));await page.waitForTimeout(250);
  const box=await weight.boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();await page.mouse.move(box.x+box.width/2-90,box.y+box.height/2,{steps:12});await page.mouse.up();
+ await page.screenshot({path:path.join(output,'upgrade-swipe.png')});
  assert.match(await page.locator('.set-row').first().getAttribute('style'),/translateX\(-96px\)/);pass('가로 밀기 삭제 버튼 표시');
  await page.locator('[data-action="deleteSet"]').first().click();assert.equal((await state()).draft.exercises[0].sets.length,6);
  await click('undoSet');assert.equal((await state()).draft.exercises[0].sets.length,7);assert.equal((await state()).draft.exercises[0].sets[0].weightKg,52.5);pass('임의 세트 삭제·무게 보존 복원');
