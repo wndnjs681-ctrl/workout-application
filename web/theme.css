@@ -35,3 +35,5 @@ input,textarea,select,.set-row input,#workout-notes,.duration-fields input{backg
 .workout-clock-panel strong,.dock-time b,.rest-large strong,.timer-circle .timer-time{color:var(--lime)}.rest-dock{background:#121c13;border-color:#4b6238;color:var(--text);box-shadow:0 6px 32px #0008}.dock-adjust{color:var(--lime);border-color:#3c4d32}.dock-skip,.dock-next{color:#b8c8ad;border-color:var(--border)}
 .timer-float{background:var(--lime);color:#16200e;border-color:#a7d450}.timer-float .icon-btn{color:#16200e;background:#16200e18}.switch{background:#46513f}.switch.on{background:var(--lime)}.switch.on span{background:#16200e}
 .toast{background:#d5f5b0;color:#16200e;border-color:#a7d450}.undo-set{color:#16200e}.danger{color:var(--red)}.time-review{background:#302913;border-color:#62532c;color:#f3d78b}.install-note{background:var(--surface);color:var(--muted);border-color:#526b3c}.next-set-highlight{outline-color:var(--lime)}
+
+.calendar-date.selected{color:#16200e}.calendar-date.selected.today{border-color:var(--lime)}
