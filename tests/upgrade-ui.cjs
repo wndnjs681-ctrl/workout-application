@@ -5,7 +5,7 @@ const output=path.resolve(__dirname,'../test-output');fs.mkdirSync(output,{recur
 const server=http.createServer((req,res)=>{const file=path.join(root,new URL(req.url,'http://localhost').pathname==='/'?'index.html':new URL(req.url,'http://localhost').pathname);try{res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(file))}catch{res.statusCode=404;res.end()}});
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
- const browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:390,height:844}});
+ const browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const click=action=>page.locator(`[data-action="${action}"]`).first().click();
  const state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('liftlog-v1')));
@@ -32,8 +32,22 @@ const server=http.createServer((req,res)=>{const file=path.join(root,new URL(req
  const box=await weight.boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();await page.mouse.move(box.x+box.width/2-90,box.y+box.height/2,{steps:12});await page.mouse.up();
  console.log('pointer trace',await page.evaluate(()=>JSON.stringify(pointerLog)));await page.screenshot({path:path.join(output,'upgrade-swipe.png')});
  assert.match(await page.locator('.set-row').first().getAttribute('style'),/translateX\(-96px\)/);pass('가로 밀기 삭제 버튼 표시');
- await page.locator('[data-action="deleteSet"]').first().click();assert.equal((await state()).draft.exercises[0].sets.length,6);
+ // A pointer press on the exposed delete button must not close the row first.
+ await page.locator('[data-action="deleteSet"]').first().hover();await page.mouse.down();
+ assert.match(await page.locator('.set-row').first().getAttribute('style'),/translateX\(-96px\)/);await page.mouse.up();assert.equal((await state()).draft.exercises[0].sets.length,6);
  await click('undoSet');assert.equal((await state()).draft.exercises[0].sets.length,7);assert.equal((await state()).draft.exercises[0].sets[0].weightKg,52.5);pass('임의 세트 삭제·무게 보존 복원');
+ // Exercise real touch events through Chromium, including reverse swipe and cancellation.
+ const cdp=await page.context().newCDPSession(page);
+ const touch=async(type,x,y)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'||type==='touchCancel'?[]:[{x,y}]});
+ const drag=async(dx,dy=0,cancel=false)=>{await page.locator('.set-number').first().evaluate(el=>el.scrollIntoView({block:'center'}));await page.waitForTimeout(200);const b=await page.locator('.set-number').first().boundingBox(),x=b.x+b.width/2,y=b.y+b.height/2;await touch('touchStart',x,y);for(let i=1;i<=8;i++)await touch('touchMove',x+dx*i/8,y+dy*i/8);await touch(cancel?'touchCancel':'touchEnd',x+dx,y+dy);await page.waitForTimeout(220)};
+ // Start from the weight field so there is room to move left inside the viewport.
+ const touchLeft=async()=>{await page.locator('[data-field="weight"]').first().evaluate(el=>el.scrollIntoView({block:'center'}));await page.waitForTimeout(200);const b=await page.locator('[data-field="weight"]').first().boundingBox(),x=b.x+b.width*.8,y=b.y+b.height/2;await touch('touchStart',x,y);for(let i=1;i<=10;i++)await touch('touchMove',x-i*9,y);await touch('touchEnd',x-90,y);await page.waitForTimeout(220)};
+ await touchLeft();assert.equal(await page.locator('.swipe-open').count(),1);assert.equal(await page.locator('[data-field="weight"]').first().evaluate(el=>document.activeElement===el),false);pass('터치 밀기 후 키보드 오작동 방지');
+ // Reverse from the visible, shifted row rather than its clipped number column.
+ let rb=await page.locator('.set-row').first().boundingBox();let rx=rb.x+rb.width*.65,ry=rb.y+rb.height/2;
+ await touch('touchStart',rx,ry);for(let i=1;i<=8;i++)await touch('touchMove',rx+i*10,ry);await touch('touchEnd',rx+80,ry);await page.waitForTimeout(220);assert.equal(await page.locator('.swipe-open').count(),0);pass('오른쪽으로 밀어 삭제 닫기');
+ await drag(0,-55);assert.equal(await page.locator('.swipe-open').count(),0);pass('세로 스크롤은 삭제로 인식하지 않음');
+ await touchLeft();await page.locator('[data-action="deleteSet"]').first().tap();assert.equal((await state()).draft.exercises[0].sets.length,6);await click('undoSet');pass('실제 터치로 삭제 버튼 탭과 복원');
  await page.locator('[data-field="weight"]').first().fill('');await click('checkSet');assert.equal((await state()).draft.exercises[0].sets[0].weightKg,0);assert.equal((await state()).draft.exercises[0].sets[0].done,true);pass('0 무게는 빈칸 그대로 완료 가능');
  await click('timerStop');await page.screenshot({path:path.join(output,'upgrade-workout.png'),fullPage:true});
  await page.reload();assert.equal((await state()).draft.exercises[0].sets.length,7);pass('업데이트 세트 재실행 복구');

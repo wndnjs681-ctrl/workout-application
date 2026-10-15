@@ -276,7 +276,7 @@ const WORKOUT_IDLE_MS=6*3600000;
 function fresh(){return {version:1,settings:{unit:'kg',rest:90,autoRest:true,goal:3},sessions:[],draft:null,customExercises:[],customRoutines:[],timer:null};}
 let data=fresh(),loadError=false;
 try{const raw=window.Android?Android.load():localStorage.getItem('liftlog-v1');if(raw){data=validate(JSON.parse(raw));}}catch(e){loadError=true;}
-let page=data.draft?'workout':'home',month=new Date(),selectedDate=dateKey(),modal=null,pickerFilter='전체',pickerQuery='',picked=new Set(),insightId='bench',historyQuery='',historySelection=null,restExerciseId=null,finishResume=false,sessionTimeId=null;
+let page=data.draft?'workout':'home',month=new Date(),selectedDate=dateKey(),modal=null,pickerFilter='전체',pickerQuery='',picked=new Set(),insightId='bench',historyQuery='',historySelection=null,restExerciseId=null,finishResume=false,sessionTimeId=null,sessionDateId=null;
 function dateKey(date=new Date()){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;}
 function parseDate(v){return new Date(v+'T12:00:00');}
 function validDate(v){return typeof v==='string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && !isNaN(parseDate(v)) && dateKey(parseDate(v))===v;}
@@ -339,6 +339,17 @@ function exerciseRest(id){return data.settings.exerciseRest?.[id]||data.settings
 const completed=s=>s.exercises.flatMap(e=>e.sets.filter(a=>a.done)).length;
 function volume(s){return s.exercises.reduce((sum,e)=>sum+(exercise(e.id)?.kind==='strength'?e.sets.filter(a=>a.done).reduce((t,a)=>t+a.weightKg*a.reps,0):0),0);}
 function monday(){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d;}
+function sessionDateSheet(id){
+ const entry=data.sessions.find(s=>s.id===id);if(!entry)return;sessionDateId=id;
+ sheet('운동 날짜 수정',`<p class="small muted">${esc(entry.name)}<br>운동한 날짜를 선택해 주세요. 세트와 운동 시간은 그대로 유지됩니다.</p><label class="form-label" for="session-date">운동 날짜</label><input class="sheet-input" id="session-date" type="date" value="${entry.date}" max="${dateKey()}" required><div class="sheet-actions">${button('sessionDateCancel','취소','secondary')}${button('saveSessionDate','날짜 저장','primary')}</div>`,'sessionDate');
+}
+function saveSessionDate(){
+ const entry=data.sessions.find(s=>s.id===sessionDateId),value=$('#session-date')?.value;
+ if(!entry)return;
+ if(!validDate(value)||value>dateKey()){toast('오늘까지의 올바른 운동 날짜를 선택해 주세요.');return;}
+ const previous=entry.date;entry.date=value;if(!save()){entry.date=previous;return;}
+ selectedDate=value;month=parseDate(value);page='calendar';closeSheet();render();sessionDetail(entry.id);toast('운동 날짜를 수정했어요.');
+}
 function weekSessions(){return data.sessions.filter(s=>s.date>=dateKey(monday()) && s.date<=dateKey());}
 function latest(){return [...data.sessions].sort((a,b)=>b.finishedAt-a.finishedAt);}
 function lastExercise(id){for(const s of latest()){const e=s.exercises.find(a=>a.id===id);if(e && e.sets.some(a=>a.done))return e;}return null;}
@@ -421,7 +432,7 @@ function customExercise(){sheet('나만의 운동',`<label class="form-label" fo
 function finishWorkout(){const s=data.draft;if(!s || !completed(s)){toast('한 세트 이상 완료한 뒤 저장해 주세요.');return;}
  const c=normalizeClock();finishResume=!c.paused;checkpointClock();c.paused=true;const seconds=Math.floor(workoutElapsedMs()/1000);stopTimer();
  sheet('오늘도 해냈어요 ♡',`<div class="success-mark">${icon('check')}</div><h2 style="text-align:center">${completed(s)}세트의 노력이 쌓였어요.</h2><p class="muted small" style="text-align:center;margin-top:8px">완료한 세트만 저장해요. 운동 시간도 확인해 주세요.</p><div class="stats">${stat('총 볼륨',fmt(weight(volume(s))),data.settings.unit)}${stat('운동',s.exercises.filter(e=>e.sets.some(a=>a.done)).length,'종목')}</div><div class="duration-fields"><label>운동 시간 (분)<input id="finish-minutes" type="number" inputmode="numeric" min="0" max="1440" value="${c.needsReview?'':Math.floor(seconds/60)}" placeholder="실제 운동한 분"></label><label>초<input id="finish-seconds" type="number" inputmode="numeric" min="0" max="59" value="${seconds%60}"></label></div>${c.needsReview?'<p class="small danger">오래된 기록의 실제 운동 시간을 입력해 주세요.</p>':''}${button('saveWorkout',icon('check')+'기록 저장','primary')}${button('saveRoutine','이 구성으로 나만의 루틴 저장','text-btn full')}`,'finish');}
-function sessionDetail(id){const s=data.sessions.find(s=>s.id===id);if(!s)return;sheet(esc(s.name),`<p class="small muted">${s.date} · ${durationLabel(s)} · ${completed(s)}세트</p>${s.exercises.map(e=>`<div class="detail-exercise"><h3>${esc(exercise(e.id).name)}</h3><div class="history-sets">${e.sets.map(set=>`<span>${esc(setDescription(set,exercise(e.id).kind))}</span>`).join('')}</div></div>`).join('')}${button('sessionTime','운동 시간 수정','text-btn',`data-id="${esc(id)}"`)}${s.notes?`<p class="small muted" style="margin-top:17px;white-space:pre-wrap">${esc(s.notes)}</p>`:''}<div class="sheet-actions">${button('repeat',icon('calendar')+'이 기록 불러오기','primary',`data-id="${esc(id)}"`)}${button('deleteSession',icon('trash'),'secondary danger',`data-id="${esc(id)}" aria-label="기록 삭제"`)}</div>`,'detail');}
+function sessionDetail(id){const s=data.sessions.find(s=>s.id===id);if(!s)return;sheet(esc(s.name),`<p class="small muted">${s.date} · ${durationLabel(s)} · ${completed(s)}세트</p>${s.exercises.map(e=>`<div class="detail-exercise"><h3>${esc(exercise(e.id).name)}</h3><div class="history-sets">${e.sets.map(set=>`<span>${esc(setDescription(set,exercise(e.id).kind))}</span>`).join('')}</div></div>`).join('')}${button('sessionDate','날짜 수정','text-btn',`data-id="${esc(id)}"`)} · ${button('sessionTime','운동 시간 수정','text-btn',`data-id="${esc(id)}"`)}${s.notes?`<p class="small muted" style="margin-top:17px;white-space:pre-wrap">${esc(s.notes)}</p>`:''}<div class="sheet-actions">${button('repeat',icon('calendar')+'이 기록 불러오기','primary',`data-id="${esc(id)}"`)}${button('deleteSession',icon('trash'),'secondary danger',`data-id="${esc(id)}" aria-label="기록 삭제"`)}</div>`,'detail');}
 function historyMatches(query=''){
  const terms=query.trim().toLowerCase().split(/\s+/).filter(Boolean);
  return [...data.sessions].sort((a,b)=>b.date.localeCompare(a.date)||b.finishedAt-a.finishedAt).filter(s=>{
@@ -496,6 +507,7 @@ const actions={
  resetClock:()=>{data.draft.clock=newClock();save();render();},
  reviewTimes:()=>{const s=latest().find(durationNeedsReview);if(s)sessionDetail(s.id);},
  sessionTime:b=>sessionTimeSheet(b.dataset.id),saveSessionTime,
+ sessionDate:b=>sessionDateSheet(b.dataset.id),saveSessionDate,sessionDateCancel:()=>sessionDetail(sessionDateId),
  restSettings:()=>restSettingsSheet(),nextRestSettings:()=>restSettingsSheet(nextSetInfo()?.exercise.id||null),exerciseRest:b=>restSettingsSheet(b.dataset.id),
  setRestPreset:b=>setRestSetting(Number(b.dataset.seconds)),saveRestSetting:()=>setRestSetting(Number($('#rest-custom').value)),startConfiguredRest:()=>setRestSetting(Number($('#rest-custom').value),true),
  nextSet:()=>{const info=nextSetInfo();if(!info){finishWorkout();return;}page='workout';render();const row=document.querySelectorAll?.('.exercise-card')[info.index]?.querySelectorAll('.set-row')[info.set];row?.scrollIntoView?.({block:'center',behavior:'smooth'});row?.classList.add('next-set-highlight');},
@@ -593,7 +605,7 @@ render();
 if(loadError){page='settings';render();toast('저장 데이터를 읽지 못했습니다. 설정에서 확인해 주세요.');}
 
 
-let deletedSet=null,swipeGesture=null,openSwipe=null;
+let deletedSet=null,swipeGesture=null,openSwipe=null,suppressSwipeClickUntil=0,suppressedSwipeRow=null;
 function addSets(index,count=1){
  const e=data.draft?.exercises[index];if(!e)return;
  if(e.sets.length+count>100){toast('운동당 최대 100세트까지 기록할 수 있어요.');return;}
@@ -607,7 +619,14 @@ function deleteSet(index,setIndex){
  const e=data.draft?.exercises[index];if(!e||!e.sets[setIndex])return;
  if(e.sets.length<=1){toast('운동마다 최소 한 세트는 남겨 주세요.');return;}
  deletedSet={draftId:data.draft.id,exercise:e,index:setIndex,set:{...e.sets[setIndex]}};
- e.sets.splice(setIndex,1);const y=window.scrollY;save();render();window.scrollTo(0,y);
+ const oldRows=[...(document.querySelectorAll?.(`.set-swipe[data-ex="${index}"]`)||[])];
+ const oldTops=oldRows.map(row=>row.getBoundingClientRect().top);
+ e.sets.splice(setIndex,1);if(!save()){e.sets.splice(setIndex,0,deletedSet.set);deletedSet=null;return;}
+ closeOpenSwipe();const y=window.scrollY;render();window.scrollTo(0,y);
+ if(!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches){
+  const rows=document.querySelectorAll?.(`.set-swipe[data-ex="${index}"]`)||[];
+  rows.forEach((row,i)=>{const before=oldTops[i>=setIndex?i+1:i];if(before!==undefined){const delta=before-row.getBoundingClientRect().top;if(delta)row.animate?.([{transform:`translateY(${delta}px)`},{transform:'translateY(0)'}],{duration:180,easing:'ease-out'});}});
+ }
  toast('세트를 삭제했어요.');$('#toast').innerHTML='세트를 삭제했어요. '+button('undoSet','되돌리기','undo-set');
 }
 function undoDeletedSet(){
@@ -622,21 +641,47 @@ document.addEventListener('focusin',event=>{
 });
 document.addEventListener('focusout',event=>{const el=event.target;if(el.dataset.field&&el.value.trim()===''){const set=data.draft?.exercises[Number(el.dataset.ex)]?.sets[Number(el.dataset.set)];if(set&&el.dataset.field==='reps'){el.value=set.reps||'';el.setCustomValidity('');}}});
 document.addEventListener('dragstart',event=>{if(event.target.closest?.('.set-row'))event.preventDefault();});
+function settleSwipe(row,opened){
+ row.classList.remove('swiping');row.style.transform=opened?'translateX(-96px)':'';
+ row.closest('.set-swipe')?.classList.toggle('swipe-open',opened);
+ if(opened)openSwipe=row;else if(openSwipe===row)openSwipe=null;
+}
+function closeOpenSwipe(){if(openSwipe){settleSwipe(openSwipe,false);openSwipe=null;}}
 document.addEventListener('pointerdown',event=>{
- const row=event.target.closest?.('.set-row');
- if(openSwipe&&(!row||row!==openSwipe)){openSwipe.style.transform='';openSwipe=null;}
- if(!row||event.target.closest('button')||event.isPrimary===false)return;
- swipeGesture={row,x:event.clientX,y:event.clientY,active:false};
+ if(event.isPrimary===false||event.button>0)return;
+ const row=event.target.closest?.('.set-row'),deleting=event.target.closest?.('.swipe-delete');
+ // The exposed delete action must stay still until its click has been delivered.
+ if(deleting)return;
+ if(openSwipe&&row!==openSwipe)closeOpenSwipe();
+ if(!row)return;
+ swipeGesture={row,x:event.clientX,y:event.clientY,pointerId:event.pointerId,offset:openSwipe===row?-96:0,position:openSwipe===row?-96:0,active:false};
 });
 document.addEventListener('pointermove',event=>{
- const g=swipeGesture;if(!g)return;const dx=event.clientX-g.x,dy=event.clientY-g.y;
- if(!g.active&&Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){swipeGesture=null;return;}
- if(dx < -12 && Math.abs(dx)>Math.abs(dy)*1.3)g.active=true;
- if(g.active){event.preventDefault();g.row.setPointerCapture?.(event.pointerId);g.row.style.transform=`translateX(${Math.max(-104,Math.min(0,dx))}px)`;}
+ const g=swipeGesture;if(!g||event.pointerId!==g.pointerId)return;
+ const dx=event.clientX-g.x,dy=event.clientY-g.y;
+ if(!g.active){
+  if(Math.abs(dy)>8&&Math.abs(dy)>=Math.abs(dx)){swipeGesture=null;return;}
+  if(Math.abs(dx)<8||Math.abs(dx)<Math.abs(dy)*1.25)return;
+  if(g.offset===0&&dx>0){swipeGesture=null;return;}
+  g.active=true;g.row.classList.add('swiping');
+  try{g.row.setPointerCapture?.(event.pointerId);}catch(e){}
+ }
+ event.preventDefault();g.position=Math.max(-96,Math.min(0,g.offset+dx));
+ g.row.style.transform=`translateX(${g.position}px)`;
 },{passive:false});
-function endSwipe(event){const g=swipeGesture;swipeGesture=null;if(!g)return;if(g.active&&event.clientX-g.x < -48){g.row.style.transform='translateX(-96px)';openSwipe=g.row;document.activeElement?.blur?.();}else g.row.style.transform='';}
+function endSwipe(event){
+ const g=swipeGesture;if(!g||event.pointerId!==g.pointerId)return;swipeGesture=null;
+ if(g.active){
+  suppressSwipeClickUntil=Date.now()+350;suppressedSwipeRow=g.row;
+  // Drag with no transition, then snap once on release. Reverse swipes close the row.
+  settleSwipe(g.row,g.position<-40);document.activeElement?.blur?.();
+ }else if(g.offset<0){settleSwipe(g.row,false);suppressSwipeClickUntil=Date.now()+350;suppressedSwipeRow=g.row;}
+}
 document.addEventListener('pointerup',endSwipe);
-document.addEventListener('pointercancel',()=>{if(swipeGesture)swipeGesture.row.style.transform='';swipeGesture=null;});
+document.addEventListener('pointercancel',()=>{const g=swipeGesture;swipeGesture=null;if(g)settleSwipe(g.row,g.offset<0);});
+document.addEventListener('click',event=>{
+ if(Date.now()<suppressSwipeClickUntil&&event.target.closest?.('.set-row')===suppressedSwipeRow){event.preventDefault();event.stopImmediatePropagation();}
+},true);
 function syncViewport(){const v=window.visualViewport;if(!v)return;document.documentElement.style.setProperty('--vv-height',v.height+'px');document.documentElement.style.setProperty('--vv-top',v.offsetTop+'px');document.documentElement.classList.toggle('keyboard-open',window.innerHeight-v.height>100);}
 window.visualViewport?.addEventListener('resize',syncViewport);window.visualViewport?.addEventListener('scroll',syncViewport);window.addEventListener?.('resize',syncViewport);syncViewport();
 

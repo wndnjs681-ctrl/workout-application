@@ -88,3 +88,16 @@ run("data.customRoutines=[{id:'r1',name:'내 루틴',exercises:[newExercise('ben
 test('손상된 시계 백업 거부',"(()=>{const x=JSON.parse(JSON.stringify(data));x.draft.clock.elapsedMs=-1;try{validate(x);return false}catch(e){return true}})()");
 
 run("data=fresh();startWorkout(dateKey(),routines[0]);data.settings.exerciseRest={squat:150};toggleTimer()");test('하단 수동 시작도 다음 운동의 휴식 시간 적용',"data.timer.total===150&&data.timer.exerciseId==='squat'");
+
+// Moving a completed workout changes its calendar day, never its recorded effort.
+nodes.set('#session-date',node());
+run("data=fresh();data.sessions=[{id:'date-edit',date:'2026-09-01',name:'날짜 테스트',startedAt:1000,finishedAt:2000,duration:600,notes:'날짜만 바꿔요',exercises:[{id:'bench',sets:[{weightKg:40,reps:8,done:true}]}]}];sessionDateSheet('date-edit')");
+test('기록 상세 날짜 수정 화면',"modal==='sessionDate'&&document.querySelector('#overlay').innerHTML.includes('2026-09-01')");
+run("document.querySelector('#session-date').value='2026-09-14';saveSessionDate()");
+test('기록 날짜 변경과 달력 이동',"data.sessions[0].date==='2026-09-14'&&selectedDate==='2026-09-14'&&month.getMonth()===8&&page==='calendar'&&modal==='detail'");
+test('날짜 수정 시 세트와 시간 메모 보존',"data.sessions[0].startedAt===1000&&data.sessions[0].finishedAt===2000&&data.sessions[0].duration===600&&data.sessions[0].notes==='날짜만 바꿔요'&&data.sessions[0].exercises[0].sets[0].weightKg===40");
+test('수정 날짜 백업과 재실행 저장',"validate(JSON.parse(localStorage.getItem('liftlog-v1'))).sessions[0].date==='2026-09-14'");
+run("sessionDateSheet('date-edit');document.querySelector('#session-date').value='2026-02-31';saveSessionDate()");test('존재하지 않는 날짜 거부',"data.sessions[0].date==='2026-09-14'&&modal==='sessionDate'");
+run("document.querySelector('#session-date').value='2999-01-01';saveSessionDate()");test('미래 운동 날짜 거부',"data.sessions[0].date==='2026-09-14'&&modal==='sessionDate'");
+run("document.querySelector('#session-date').value='';saveSessionDate()");test('빈 날짜 거부',"data.sessions[0].date==='2026-09-14'");
+run("document.querySelector('#session-date').value='2026-09-15';loadError=true;saveSessionDate();loadError=false");test('저장 실패 시 원래 날짜 보존',"data.sessions[0].date==='2026-09-14'");
