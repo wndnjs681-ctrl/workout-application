@@ -19,6 +19,257 @@ const library=[
  ['curl','덤벨 컬','팔','덤벨','strength',8],['barbellcurl','바벨 컬','팔','바벨','strength',15],['hammercurl','해머 컬','팔','덤벨','strength',8],['pushdown','트라이셉스 푸시다운','팔','케이블','strength',15],['extension','오버헤드 트라이셉스 익스텐션','팔','덤벨','strength',8],
  ['plank','플랭크','코어','맨몸','duration',0],['crunch','크런치','코어','맨몸','bodyweight',0],['legraise','행잉 레그 레이즈','코어','맨몸','bodyweight',0],['russiantwist','러시안 트위스트','코어','덤벨','strength',5],['abwheel','앱 휠 롤아웃','코어','맨몸','bodyweight',0],
  ['run','러닝머신','유산소','머신','duration',0],['bike','실내 자전거','유산소','머신','duration',0],['rowing','로잉 머신','유산소','머신','duration',0],['walk','걷기','유산소','맨몸','duration',0],['rope','줄넘기','유산소','기타','duration',0]
+,
+ ["ex_001", "인클라인 바벨 벤치프레스", "가슴", "바벨", "strength", 0],
+ ["ex_002", "디클라인 바벨 벤치프레스", "가슴", "바벨", "strength", 0],
+ ["ex_003", "클로즈 그립 벤치프레스", "가슴", "바벨", "strength", 0],
+ ["ex_004", "플로어 프레스", "가슴", "바벨", "strength", 0],
+ ["ex_005", "랜드마인 체스트 프레스", "가슴", "바벨", "strength", 0],
+ ["ex_006", "덤벨 벤치프레스", "가슴", "덤벨", "strength", 0],
+ ["ex_007", "디클라인 덤벨 프레스", "가슴", "덤벨", "strength", 0],
+ ["ex_008", "인클라인 덤벨 플라이", "가슴", "덤벨", "strength", 0],
+ ["ex_009", "덤벨 풀오버", "가슴", "덤벨", "strength", 0],
+ ["ex_010", "덤벨 스퀴즈 프레스", "가슴", "덤벨", "strength", 0],
+ ["ex_011", "덤벨 플로어 프레스", "가슴", "덤벨", "strength", 0],
+ ["ex_012", "펙 덱 플라이", "가슴", "머신", "strength", 0],
+ ["ex_013", "인클라인 체스트 프레스 머신", "가슴", "머신", "strength", 0],
+ ["ex_014", "디클라인 체스트 프레스 머신", "가슴", "머신", "strength", 0],
+ ["ex_015", "해머 스트렝스 체스트 프레스", "가슴", "머신", "strength", 0],
+ ["ex_016", "어시스트 딥스", "가슴", "머신", "strength", 0],
+ ["ex_017", "스미스 벤치프레스", "가슴", "머신", "strength", 0],
+ ["ex_018", "스미스 인클라인 벤치프레스", "가슴", "머신", "strength", 0],
+ ["ex_019", "로우 케이블 플라이", "가슴", "케이블", "strength", 0],
+ ["ex_020", "하이 케이블 플라이", "가슴", "케이블", "strength", 0],
+ ["ex_021", "시티드 케이블 체스트 프레스", "가슴", "케이블", "strength", 0],
+ ["ex_022", "원암 케이블 체스트 프레스", "가슴", "케이블", "strength", 0],
+ ["ex_023", "인클라인 푸시업", "가슴", "맨몸", "bodyweight", 0],
+ ["ex_024", "디클라인 푸시업", "가슴", "맨몸", "bodyweight", 0],
+ ["ex_025", "다이아몬드 푸시업", "가슴", "맨몸", "bodyweight", 0],
+ ["ex_026", "니 푸시업", "가슴", "맨몸", "bodyweight", 0],
+ ["ex_027", "와이드 푸시업", "가슴", "맨몸", "bodyweight", 0],
+ ["ex_028", "펜들레이 로우", "등", "바벨", "strength", 0],
+ ["ex_029", "언더그립 바벨 로우", "등", "바벨", "strength", 0],
+ ["ex_030", "스내치 그립 데드리프트", "등", "바벨", "strength", 0],
+ ["ex_031", "랙 풀", "등", "바벨", "strength", 0],
+ ["ex_032", "바벨 풀오버", "등", "바벨", "strength", 0],
+ ["ex_033", "바벨 슈러그", "등", "바벨", "strength", 0],
+ ["ex_034", "랜드마인 로우", "등", "바벨", "strength", 0],
+ ["ex_035", "덤벨 데드리프트", "등", "덤벨", "strength", 0],
+ ["ex_036", "벤트오버 덤벨 로우", "등", "덤벨", "strength", 0],
+ ["ex_037", "인클라인 덤벨 로우", "등", "덤벨", "strength", 0],
+ ["ex_038", "체스트 서포티드 덤벨 로우", "등", "덤벨", "strength", 0],
+ ["ex_039", "덤벨 슈러그", "등", "덤벨", "strength", 0],
+ ["ex_040", "레니게이드 로우", "등", "덤벨", "strength", 0],
+ ["ex_041", "와이드 그립 랫 풀다운", "등", "케이블", "strength", 0],
+ ["ex_042", "언더그립 랫 풀다운", "등", "케이블", "strength", 0],
+ ["ex_043", "뉴트럴 그립 랫 풀다운", "등", "케이블", "strength", 0],
+ ["ex_044", "원암 랫 풀다운", "등", "케이블", "strength", 0],
+ ["ex_045", "스트레이트 암 풀다운", "등", "케이블", "strength", 0],
+ ["ex_046", "원암 케이블 로우", "등", "케이블", "strength", 0],
+ ["ex_047", "와이드 그립 시티드 로우", "등", "케이블", "strength", 0],
+ ["ex_048", "케이블 풀오버", "등", "케이블", "strength", 0],
+ ["ex_049", "어시스트 풀업", "등", "머신", "strength", 0],
+ ["ex_050", "해머 스트렝스 로우", "등", "머신", "strength", 0],
+ ["ex_051", "아이소 레터럴 로우", "등", "머신", "strength", 0],
+ ["ex_052", "하이 로우 머신", "등", "머신", "strength", 0],
+ ["ex_053", "로우 로우 머신", "등", "머신", "strength", 0],
+ ["ex_054", "체스트 서포티드 로우 머신", "등", "머신", "strength", 0],
+ ["ex_055", "스미스 바벨 로우", "등", "머신", "strength", 0],
+ ["ex_056", "백 익스텐션 머신", "등", "머신", "strength", 0],
+ ["ex_057", "친업", "등", "맨몸", "bodyweight", 0],
+ ["ex_058", "뉴트럴 그립 풀업", "등", "맨몸", "bodyweight", 0],
+ ["ex_059", "와이드 그립 풀업", "등", "맨몸", "bodyweight", 0],
+ ["ex_060", "인버티드 로우", "등", "맨몸", "bodyweight", 0],
+ ["ex_061", "백 익스텐션", "등", "맨몸", "bodyweight", 0],
+ ["ex_062", "슈퍼맨", "등", "맨몸", "bodyweight", 0],
+ ["ex_063", "프론트 스쿼트", "하체", "바벨", "strength", 0],
+ ["ex_064", "박스 스쿼트", "하체", "바벨", "strength", 0],
+ ["ex_065", "스모 데드리프트", "하체", "바벨", "strength", 0],
+ ["ex_066", "스티프 레그 데드리프트", "하체", "바벨", "strength", 0],
+ ["ex_067", "바벨 런지", "하체", "바벨", "strength", 0],
+ ["ex_068", "바벨 불가리안 스플릿 스쿼트", "하체", "바벨", "strength", 0],
+ ["ex_069", "바벨 굿모닝", "하체", "바벨", "strength", 0],
+ ["ex_070", "바벨 글루트 브리지", "하체", "바벨", "strength", 0],
+ ["ex_071", "바벨 스텝업", "하체", "바벨", "strength", 0],
+ ["ex_072", "저처 스쿼트", "하체", "바벨", "strength", 0],
+ ["ex_073", "덤벨 스쿼트", "하체", "덤벨", "strength", 0],
+ ["ex_074", "덤벨 루마니안 데드리프트", "하체", "덤벨", "strength", 0],
+ ["ex_075", "덤벨 스모 스쿼트", "하체", "덤벨", "strength", 0],
+ ["ex_076", "덤벨 불가리안 스플릿 스쿼트", "하체", "덤벨", "strength", 0],
+ ["ex_077", "덤벨 리버스 런지", "하체", "덤벨", "strength", 0],
+ ["ex_078", "덤벨 워킹 런지", "하체", "덤벨", "strength", 0],
+ ["ex_079", "덤벨 스텝업", "하체", "덤벨", "strength", 0],
+ ["ex_080", "덤벨 사이드 런지", "하체", "덤벨", "strength", 0],
+ ["ex_081", "싱글 레그 덤벨 데드리프트", "하체", "덤벨", "strength", 0],
+ ["ex_082", "덤벨 힙 쓰러스트", "하체", "덤벨", "strength", 0],
+ ["ex_083", "덤벨 카프 레이즈", "하체", "덤벨", "strength", 0],
+ ["ex_084", "핵 스쿼트", "하체", "머신", "strength", 0],
+ ["ex_085", "브이 스쿼트", "하체", "머신", "strength", 0],
+ ["ex_086", "스미스 스쿼트", "하체", "머신", "strength", 0],
+ ["ex_087", "스미스 런지", "하체", "머신", "strength", 0],
+ ["ex_088", "스미스 힙 쓰러스트", "하체", "머신", "strength", 0],
+ ["ex_089", "스미스 카프 레이즈", "하체", "머신", "strength", 0],
+ ["ex_090", "수평 레그 프레스", "하체", "머신", "strength", 0],
+ ["ex_091", "싱글 레그 프레스", "하체", "머신", "strength", 0],
+ ["ex_092", "시티드 레그 컬", "하체", "머신", "strength", 0],
+ ["ex_093", "라잉 레그 컬", "하체", "머신", "strength", 0],
+ ["ex_094", "스탠딩 레그 컬", "하체", "머신", "strength", 0],
+ ["ex_095", "싱글 레그 익스텐션", "하체", "머신", "strength", 0],
+ ["ex_096", "힙 어브덕션", "하체", "머신", "strength", 0],
+ ["ex_097", "힙 어덕션", "하체", "머신", "strength", 0],
+ ["ex_098", "힙 쓰러스트 머신", "하체", "머신", "strength", 0],
+ ["ex_099", "글루트 킥백 머신", "하체", "머신", "strength", 0],
+ ["ex_100", "시티드 카프 레이즈", "하체", "머신", "strength", 0],
+ ["ex_101", "레그 프레스 카프 레이즈", "하체", "머신", "strength", 0],
+ ["ex_102", "벨트 스쿼트", "하체", "머신", "strength", 0],
+ ["ex_103", "펜듈럼 스쿼트", "하체", "머신", "strength", 0],
+ ["ex_104", "케이블 킥백", "하체", "케이블", "strength", 0],
+ ["ex_105", "케이블 풀스루", "하체", "케이블", "strength", 0],
+ ["ex_106", "케이블 힙 어브덕션", "하체", "케이블", "strength", 0],
+ ["ex_107", "케이블 힙 어덕션", "하체", "케이블", "strength", 0],
+ ["ex_108", "케이블 스쿼트", "하체", "케이블", "strength", 0],
+ ["ex_109", "케틀벨 스윙", "하체", "케틀벨", "strength", 0],
+ ["ex_110", "케틀벨 고블릿 스쿼트", "하체", "케틀벨", "strength", 0],
+ ["ex_111", "케틀벨 데드리프트", "하체", "케틀벨", "strength", 0],
+ ["ex_112", "케틀벨 런지", "하체", "케틀벨", "strength", 0],
+ ["ex_113", "불가리안 스플릿 스쿼트", "하체", "맨몸", "bodyweight", 0],
+ ["ex_114", "리버스 런지", "하체", "맨몸", "bodyweight", 0],
+ ["ex_115", "워킹 런지", "하체", "맨몸", "bodyweight", 0],
+ ["ex_116", "사이드 런지", "하체", "맨몸", "bodyweight", 0],
+ ["ex_117", "싱글 레그 스쿼트", "하체", "맨몸", "bodyweight", 0],
+ ["ex_118", "점프 스쿼트", "하체", "맨몸", "bodyweight", 0],
+ ["ex_119", "글루트 브리지", "하체", "맨몸", "bodyweight", 0],
+ ["ex_120", "싱글 레그 글루트 브리지", "하체", "맨몸", "bodyweight", 0],
+ ["ex_121", "프로깅", "하체", "맨몸", "bodyweight", 0],
+ ["ex_122", "덩키 킥", "하체", "맨몸", "bodyweight", 0],
+ ["ex_123", "파이어 하이드런트", "하체", "맨몸", "bodyweight", 0],
+ ["ex_124", "클램셸", "하체", "맨몸", "bodyweight", 0],
+ ["ex_125", "맨몸 카프 레이즈", "하체", "맨몸", "bodyweight", 0],
+ ["ex_126", "노르딕 컬", "하체", "맨몸", "bodyweight", 0],
+ ["ex_127", "시시 스쿼트", "하체", "맨몸", "bodyweight", 0],
+ ["ex_128", "시티드 바벨 숄더 프레스", "어깨", "바벨", "strength", 0],
+ ["ex_129", "푸시 프레스", "어깨", "바벨", "strength", 0],
+ ["ex_130", "바벨 업라이트 로우", "어깨", "바벨", "strength", 0],
+ ["ex_131", "랜드마인 숄더 프레스", "어깨", "바벨", "strength", 0],
+ ["ex_132", "비하인드 넥 프레스", "어깨", "바벨", "strength", 0],
+ ["ex_133", "아놀드 프레스", "어깨", "덤벨", "strength", 0],
+ ["ex_134", "덤벨 프론트 레이즈", "어깨", "덤벨", "strength", 0],
+ ["ex_135", "벤트오버 레터럴 레이즈", "어깨", "덤벨", "strength", 0],
+ ["ex_136", "시티드 덤벨 숄더 프레스", "어깨", "덤벨", "strength", 0],
+ ["ex_137", "덤벨 업라이트 로우", "어깨", "덤벨", "strength", 0],
+ ["ex_138", "인클라인 레터럴 레이즈", "어깨", "덤벨", "strength", 0],
+ ["ex_139", "원암 덤벨 숄더 프레스", "어깨", "덤벨", "strength", 0],
+ ["ex_140", "케이블 사이드 레터럴 레이즈", "어깨", "케이블", "strength", 0],
+ ["ex_141", "케이블 프론트 레이즈", "어깨", "케이블", "strength", 0],
+ ["ex_142", "케이블 리버스 플라이", "어깨", "케이블", "strength", 0],
+ ["ex_143", "케이블 업라이트 로우", "어깨", "케이블", "strength", 0],
+ ["ex_144", "케이블 외회전", "어깨", "케이블", "strength", 0],
+ ["ex_145", "케이블 내회전", "어깨", "케이블", "strength", 0],
+ ["ex_146", "숄더 프레스 머신", "어깨", "머신", "strength", 0],
+ ["ex_147", "사이드 레터럴 레이즈 머신", "어깨", "머신", "strength", 0],
+ ["ex_148", "리버스 펙 덱 플라이", "어깨", "머신", "strength", 0],
+ ["ex_149", "스미스 숄더 프레스", "어깨", "머신", "strength", 0],
+ ["ex_150", "파이크 푸시업", "어깨", "맨몸", "bodyweight", 0],
+ ["ex_151", "핸드스탠드 푸시업", "어깨", "맨몸", "bodyweight", 0],
+ ["ex_152", "숄더 탭", "어깨", "맨몸", "bodyweight", 0],
+ ["ex_153", "이지바 컬", "팔", "바벨", "strength", 0],
+ ["ex_154", "리버스 바벨 컬", "팔", "바벨", "strength", 0],
+ ["ex_155", "바벨 프리처 컬", "팔", "바벨", "strength", 0],
+ ["ex_156", "스파이더 컬", "팔", "바벨", "strength", 0],
+ ["ex_157", "바벨 리스트 컬", "팔", "바벨", "strength", 0],
+ ["ex_158", "바벨 리버스 리스트 컬", "팔", "바벨", "strength", 0],
+ ["ex_159", "라잉 트라이셉스 익스텐션", "팔", "바벨", "strength", 0],
+ ["ex_160", "클로즈 그립 플로어 프레스", "팔", "바벨", "strength", 0],
+ ["ex_161", "인클라인 덤벨 컬", "팔", "덤벨", "strength", 0],
+ ["ex_162", "컨센트레이션 컬", "팔", "덤벨", "strength", 0],
+ ["ex_163", "덤벨 프리처 컬", "팔", "덤벨", "strength", 0],
+ ["ex_164", "조트맨 컬", "팔", "덤벨", "strength", 0],
+ ["ex_165", "크로스바디 해머 컬", "팔", "덤벨", "strength", 0],
+ ["ex_166", "덤벨 킥백", "팔", "덤벨", "strength", 0],
+ ["ex_167", "덤벨 스컬 크러셔", "팔", "덤벨", "strength", 0],
+ ["ex_168", "원암 오버헤드 트라이셉스 익스텐션", "팔", "덤벨", "strength", 0],
+ ["ex_169", "덤벨 리스트 컬", "팔", "덤벨", "strength", 0],
+ ["ex_170", "덤벨 리버스 리스트 컬", "팔", "덤벨", "strength", 0],
+ ["ex_171", "케이블 컬", "팔", "케이블", "strength", 0],
+ ["ex_172", "로프 해머 컬", "팔", "케이블", "strength", 0],
+ ["ex_173", "케이블 프리처 컬", "팔", "케이블", "strength", 0],
+ ["ex_174", "하이 케이블 컬", "팔", "케이블", "strength", 0],
+ ["ex_175", "원암 케이블 컬", "팔", "케이블", "strength", 0],
+ ["ex_176", "로프 트라이셉스 푸시다운", "팔", "케이블", "strength", 0],
+ ["ex_177", "리버스 그립 푸시다운", "팔", "케이블", "strength", 0],
+ ["ex_178", "케이블 오버헤드 트라이셉스 익스텐션", "팔", "케이블", "strength", 0],
+ ["ex_179", "원암 케이블 푸시다운", "팔", "케이블", "strength", 0],
+ ["ex_180", "케이블 트라이셉스 킥백", "팔", "케이블", "strength", 0],
+ ["ex_181", "바이셉스 컬 머신", "팔", "머신", "strength", 0],
+ ["ex_182", "트라이셉스 익스텐션 머신", "팔", "머신", "strength", 0],
+ ["ex_183", "딥스 머신", "팔", "머신", "strength", 0],
+ ["ex_184", "벤치 딥스", "팔", "맨몸", "bodyweight", 0],
+ ["ex_185", "트라이셉스 푸시업", "팔", "맨몸", "bodyweight", 0],
+ ["ex_186", "바이시클 크런치", "코어", "맨몸", "bodyweight", 0],
+ ["ex_187", "리버스 크런치", "코어", "맨몸", "bodyweight", 0],
+ ["ex_188", "싯업", "코어", "맨몸", "bodyweight", 0],
+ ["ex_189", "브이업", "코어", "맨몸", "bodyweight", 0],
+ ["ex_190", "니업", "코어", "맨몸", "bodyweight", 0],
+ ["ex_191", "행잉 니 레이즈", "코어", "맨몸", "bodyweight", 0],
+ ["ex_192", "라잉 레그 레이즈", "코어", "맨몸", "bodyweight", 0],
+ ["ex_193", "힐 터치", "코어", "맨몸", "bodyweight", 0],
+ ["ex_194", "데드 버그", "코어", "맨몸", "bodyweight", 0],
+ ["ex_195", "버드 독", "코어", "맨몸", "bodyweight", 0],
+ ["ex_196", "마운틴 클라이머", "코어", "맨몸", "bodyweight", 0],
+ ["ex_197", "플러터 킥", "코어", "맨몸", "bodyweight", 0],
+ ["ex_198", "토 터치 크런치", "코어", "맨몸", "bodyweight", 0],
+ ["ex_199", "시티드 니 턱", "코어", "맨몸", "bodyweight", 0],
+ ["ex_200", "케이블 크런치", "코어", "케이블", "strength", 0],
+ ["ex_201", "케이블 우드촙", "코어", "케이블", "strength", 0],
+ ["ex_202", "팔로프 프레스", "코어", "케이블", "strength", 0],
+ ["ex_203", "케이블 리버스 크런치", "코어", "케이블", "strength", 0],
+ ["ex_204", "덤벨 사이드 벤드", "코어", "덤벨", "strength", 0],
+ ["ex_205", "웨이티드 크런치", "코어", "덤벨", "strength", 0],
+ ["ex_206", "웨이티드 싯업", "코어", "덤벨", "strength", 0],
+ ["ex_207", "앱 크런치 머신", "코어", "머신", "strength", 0],
+ ["ex_208", "로터리 토르소", "코어", "머신", "strength", 0],
+ ["ex_209", "캡틴 체어 레그 레이즈", "코어", "머신", "strength", 0],
+ ["ex_210", "일립티컬", "유산소", "머신", "duration", 0],
+ ["ex_211", "스텝밀", "유산소", "머신", "duration", 0],
+ ["ex_212", "스테퍼", "유산소", "머신", "duration", 0],
+ ["ex_213", "스핀 바이크", "유산소", "머신", "duration", 0],
+ ["ex_214", "리컴번트 바이크", "유산소", "머신", "duration", 0],
+ ["ex_215", "스키 에르그", "유산소", "머신", "duration", 0],
+ ["ex_216", "에어 바이크", "유산소", "머신", "duration", 0],
+ ["ex_217", "경사 걷기", "유산소", "머신", "duration", 0],
+ ["ex_218", "야외 달리기", "유산소", "맨몸", "duration", 0],
+ ["ex_219", "조깅", "유산소", "맨몸", "duration", 0],
+ ["ex_220", "빠르게 걷기", "유산소", "맨몸", "duration", 0],
+ ["ex_221", "계단 오르기", "유산소", "맨몸", "duration", 0],
+ ["ex_222", "제자리 달리기", "유산소", "맨몸", "duration", 0],
+ ["ex_223", "점핑 잭", "유산소", "맨몸", "duration", 0],
+ ["ex_224", "버피", "유산소", "맨몸", "duration", 0],
+ ["ex_225", "하이 니", "유산소", "맨몸", "duration", 0],
+ ["ex_226", "수영", "유산소", "맨몸", "duration", 0],
+ ["ex_227", "등산", "유산소", "맨몸", "duration", 0],
+ ["ex_228", "댄스", "유산소", "맨몸", "duration", 0],
+ ["ex_229", "복싱", "유산소", "맨몸", "duration", 0],
+ ["ex_230", "킥복싱", "유산소", "맨몸", "duration", 0],
+ ["ex_231", "야외 자전거", "유산소", "기타", "duration", 0],
+ ["ex_232", "배틀 로프", "유산소", "기타", "duration", 0],
+ ["ex_233", "썰매 밀기", "유산소", "기타", "duration", 0],
+ ["ex_234", "썰매 끌기", "유산소", "기타", "duration", 0],
+ ["ex_235", "목 스트레칭", "기타", "맨몸", "duration", 0],
+ ["ex_236", "어깨 스트레칭", "기타", "맨몸", "duration", 0],
+ ["ex_237", "가슴 스트레칭", "기타", "맨몸", "duration", 0],
+ ["ex_238", "광배근 스트레칭", "기타", "맨몸", "duration", 0],
+ ["ex_239", "고관절 스트레칭", "기타", "맨몸", "duration", 0],
+ ["ex_240", "햄스트링 스트레칭", "기타", "맨몸", "duration", 0],
+ ["ex_241", "대퇴사두근 스트레칭", "기타", "맨몸", "duration", 0],
+ ["ex_242", "종아리 스트레칭", "기타", "맨몸", "duration", 0],
+ ["ex_243", "요가", "기타", "맨몸", "duration", 0],
+ ["ex_244", "필라테스", "기타", "맨몸", "duration", 0],
+ ["ex_245", "폼롤러 마사지", "기타", "기타", "duration", 0],
+ ["ex_246", "사이드 플랭크", "코어", "맨몸", "duration", 0],
+ ["ex_247", "리버스 플랭크", "코어", "맨몸", "duration", 0],
+ ["ex_248", "할로우 홀드", "코어", "맨몸", "duration", 0],
+ ["ex_249", "월 싯", "코어", "맨몸", "duration", 0],
+ ["ex_250", "베어 플랭크", "코어", "맨몸", "duration", 0]
 ].map(([id,name,muscle,equipment,kind,weight])=>({id,name,muscle,equipment,kind,weight}));
 const routines=[{name:'전신 밸런스',desc:'처음부터 탄탄하게, 전신 기본 루틴',ids:['squat','bench','latpull','plank'],color:'',tag:'FULL BODY'}, {name:'상체 집중',desc:'가슴 · 등 · 어깨, 균형 있게',ids:['bench','seatedrow','shoulderpress','curl'],color:'blue',tag:'UPPER BODY'}, {name:'하체 & 코어',desc:'흔들리지 않는 힘의 기초',ids:['squat','rdl','legcurl','plank'],color:'peach',tag:'LOWER BODY'}];
 function fresh(){return {version:1,settings:{unit:'kg',rest:90,autoRest:true,goal:3},sessions:[],draft:null,customExercises:[],timer:null};}
@@ -83,7 +334,7 @@ function workout(){
  const s=data.draft;if(!s){page='home';return home();}
  const done=completed(s),total=s.exercises.reduce((n,e)=>n+e.sets.length,0);
  return `<div class="workout-top"><div class="workout-header">${button('navigate',icon('back'),'icon-btn','data-page="home" aria-label="홈으로"')}<span class="eyebrow">WORKOUT IN PROGRESS</span>${button('timer',icon('clock'),'icon-btn','aria-label="타이머"')}</div></div><div class="row"><span class="small muted">${s.date}</span><span class="elapsed" id="elapsed">${clock(Math.floor((Date.now()-s.startedAt)/1000))}</span></div><input class="session-name" id="session-name" maxlength="80" aria-label="운동 이름" value="${esc(s.name)}"><div class="row"><span class="small muted">${s.exercises.length}개 운동 · ${done}/${total}세트 완료</span>${button('unit',data.settings.unit.toUpperCase()+' ⇄','pill')}</div>
- ${s.exercises.map((e,i)=>{const ex=exercise(e.id),last=lastExercise(e.id),kind=ex.kind;return `<section class="card exercise-card"><div class="row"><h3>${esc(ex.name)}</h3>${button('exerciseMenu',icon('more'),'icon-btn',`data-index="${i}" aria-label="${esc(ex.name)} 편집"`)}</div><p class="last">${last?`지난 기록 · ${setDescription(last.sets.find(a=>a.done),kind)}`:'첫 기록 · 오늘의 기준을 만들어보세요'}</p><div class="set-labels"><span>세트</span><span>${kind==='strength'?data.settings.unit:kind==='duration'?'기록':'중량'}</span><span>${kind==='duration'?'시간 (초)':'횟수'}</span><span>완료</span></div>${e.sets.map((set,j)=>`<div class="set-row ${set.done?'done':''}"><span class="set-number">${j+1}</span>${kind==='strength'?`<input inputmode="decimal" type="number" min="0" max="${weight(10000)}" step="any" value="${weight(set.weightKg)}" data-field="weight" data-ex="${i}" data-set="${j}" aria-label="${esc(ex.name)} ${j+1}세트 무게">`:`<span class="small muted" style="text-align:center">${kind==='duration'?'타임':'맨몸'}</span>`}<input inputmode="numeric" type="number" min="1" max="100000" step="1" value="${set.reps||''}" data-field="reps" data-ex="${i}" data-set="${j}" aria-label="${esc(ex.name)} ${j+1}세트 ${kind==='duration'?'초':'횟수'}">${button('checkSet',icon('check'),`check ${set.done?'done':''}`,`data-ex="${i}" data-set="${j}" aria-label="${esc(ex.name)} ${j+1}세트 완료" aria-pressed="${set.done}"`)}</div>`).join('')}${button('addSet',icon('plus')+' 세트 추가','add-set',`data-index="${i}"`)}</section>`;}).join('')}
+ <p class="micro swipe-hint">세트를 왼쪽으로 밀면 삭제할 수 있어요.</p>${s.exercises.map((e,i)=>{const ex=exercise(e.id),last=lastExercise(e.id),kind=ex.kind;return `<section class="card exercise-card"><div class="row"><h3>${esc(ex.name)}</h3>${button('exerciseMenu',icon('more'),'icon-btn',`data-index="${i}" aria-label="${esc(ex.name)} 편집"`)}</div><p class="last">${last?`지난 기록 · ${setDescription(last.sets.find(a=>a.done),kind)}`:'첫 기록 · 오늘의 기준을 만들어보세요'}</p><div class="set-labels"><span>세트</span><span>${kind==='strength'?data.settings.unit:kind==='duration'?'기록':'중량'}</span><span>${kind==='duration'?'시간 (초)':'횟수'}</span><span>완료</span></div>${e.sets.map((set,j)=>`<div class="set-swipe" data-ex="${i}" data-set="${j}">${button('deleteSet',icon('trash')+' 삭제','swipe-delete',`data-ex="${i}" data-set="${j}" aria-label="${esc(ex.name)} ${j+1}세트 삭제"`)}<div class="set-row ${set.done?'done':''}"><span class="set-number">${j+1}</span>${kind==='strength'?`<input inputmode="decimal" type="number" min="0" max="${weight(10000)}" step="any" value="${set.weightKg===0?'':weight(set.weightKg)}" placeholder="0" data-field="weight" data-ex="${i}" data-set="${j}" aria-label="${esc(ex.name)} ${j+1}세트 무게">`:`<span class="small muted" style="text-align:center">${kind==='duration'?'타임':'맨몸'}</span>`}<input inputmode="numeric" type="number" min="1" max="100000" step="1" value="${set.reps||''}" placeholder="횟수" data-field="reps" data-ex="${i}" data-set="${j}" aria-label="${esc(ex.name)} ${j+1}세트 ${kind==='duration'?'초':'횟수'}">${button('checkSet',icon('check'),`check ${set.done?'done':''}`,`data-ex="${i}" data-set="${j}" aria-label="${esc(ex.name)} ${j+1}세트 완료" aria-pressed="${set.done}"`)}</div></div>`).join('')}${button('addSet',icon('plus')+' 세트 추가 · 이전 값 복사','add-set',`data-index="${i}"`)+button('addThreeSets','+3 세트','quick-sets',`data-index="${i}" aria-label="${esc(ex.name)} 3세트 추가"`)}</section>`;}).join('')}
  ${s.exercises.length?'':`<div class="section card">${empty('오늘의 운동을 골라주세요','운동 검색에서 부위별로 선택할 수 있어요.','dumbbell')}</div>`}<div class="section">${button('pick',icon('plus')+'운동 추가','secondary full')}${button('history',icon('calendar')+' 과거 운동 불러오기','secondary full','style="margin-top:10px"')}</div><label class="note-label" for="workout-notes">오늘의 메모</label><textarea class="note" id="workout-notes" maxlength="2000" rows="2" placeholder="컨디션, 자세, 다음 운동의 목표…">${esc(s.notes)}</textarea><div class="workout-bottom">${button('cancelWorkout','운동 취소','secondary danger')}${button('finish',icon('check')+'운동 완료','primary')}</div><p class="micro" style="text-align:center;margin-top:14px">완료한 세트만 기록에 저장됩니다.</p>`;
 }
 function setDescription(set,kind){if(!set)return '기록 없음';return kind==='duration'?`${set.reps}초`:kind==='bodyweight'?`맨몸 × ${set.reps}회`:`${fmt(weight(set.weightKg))} ${data.settings.unit} × ${set.reps}회`;}
@@ -100,13 +351,13 @@ function insights(){
  const weeks=Array.from({length:4},(_,i)=>{const end=new Date(monday());end.setDate(end.getDate()-(3-i)*7+6);const start=new Date(end);start.setDate(end.getDate()-6);return{n:sessions.filter(s=>s.date>=dateKey(start)&&s.date<=dateKey(end)).length,label:i===3?'이번 주':`${3-i}주 전`};});
  return `${head()}<div class="eyebrow">STRONGER, ONE REP AT A TIME</div><h1 style="margin-top:9px">숫자로 보는 나의 성장</h1><p class="welcome-line">꾸준한 나를, 기록으로 확인하세요.</p><div class="stats">${stat('누적 운동',sessions.length,'회')}${stat('완료한 세트',sessions.reduce((n,s)=>n+completed(s),0),'세트')}</div><div class="section card"><div class="row"><h3>운동 빈도</h3><span class="small muted">최근 4주</span></div><div class="bar-chart">${weeks.map(w=>`<div class="bar"><span class="small lime">${w.n}회</span><div style="height:${Math.max(3,w.n/Math.max(1,...weeks.map(x=>x.n))*78)}px"></div>${w.label}</div>`).join('')}</div></div><section class="section card"><div class="row"><h3>운동별 최고 기록</h3><span class="pill">${ex.kind==='strength'?data.settings.unit:ex.kind==='duration'?'초':'회'}</span></div><select id="insight-exercise" class="chart-select" aria-label="성장 그래프 운동 선택">${(recorded.length?recorded:[ex]).map(e=>`<option value="${esc(e.id)}" ${e.id===insightId?'selected':''}>${esc(e.name)}</option>`).join('')}</select>${chart||empty('성장의 출발선이에요','운동을 완료하면 실제 기록으로 그래프가 채워집니다.','chart')}<p class="micro">${ex.kind==='strength'?'운동별 세트 최고 무게':'운동별 세트 최고 '+(ex.kind==='duration'?'시간':'횟수')} · 최근 10회 기록</p></section><div class="section card"><span class="muted small">지금까지 들어 올린 총 볼륨</span><div class="big-number" style="margin-top:12px">${fmt(weight(totalVol))} <span class="small muted">${data.settings.unit}</span></div><p class="micro" style="margin-top:10px">중량 운동의 무게 × 횟수 합계. 맨몸·시간 운동 제외.</p></div><div class="section tip">${icon('bolt')}<p>기록이 쌓일수록 변화가 보입니다. 지난 기록을 기준으로 나만의 다음 목표를 정해보세요.</p></div>`;
 }
-function settings(){return `${head()}<div class="eyebrow">MAKE IT YOURS</div><h1 style="margin-top:9px">나에게 맞게</h1><p class="welcome-line">익숙한 단위, 편안한 운동의 리듬.</p>${loadError?'<div class="section tip danger">저장된 데이터 형식을 읽지 못했습니다. 원본은 보존되어 있으며, 백업 파일로 복원하거나 초기화할 수 있습니다.</div>':''}<div class="section card"><div class="setting-row"><div><h3>무게 단위</h3><p>기존 기록도 자동으로 환산돼요</p></div><div class="segmented">${['kg','lb'].map(u=>button('setUnit',u,u===data.settings.unit?'active':'',`data-unit="${u}"`)).join('')}</div></div><div class="setting-row"><div><h3>자동 휴식 타이머</h3><p>세트를 완료하면 바로 시작</p></div>${button('toggleRest','<span></span>',`switch ${data.settings.autoRest?'on':''}`,`role="switch" aria-label="자동 휴식 타이머" aria-checked="${data.settings.autoRest}"`)}</div><div class="setting-row"><div><h3>기본 휴식 시간</h3><p>나의 운동 속도에 맞게</p></div><select id="rest-setting" aria-label="기본 휴식 시간">${[30,45,60,90,120,180,300,...([30,45,60,90,120,180,300].includes(data.settings.rest)?[]:[data.settings.rest])].sort((a,b)=>a-b).map(n=>`<option value="${n}" ${n===data.settings.rest?'selected':''}>${n}초</option>`).join('')}</select></div><div class="setting-row"><div><h3>주간 운동 목표</h3><p>꾸준히 지킬 수 있는 약속</p></div><select id="goal-setting" aria-label="주간 운동 목표">${Array.from({length:7},(_,i)=>`<option value="${i+1}" ${data.settings.goal===i+1?'selected':''}>주 ${i+1}회</option>`).join('')}</select></div></div><div class="section card"><div class="row"><div class="routine-art blue">${icon('widget')}</div><div style="flex:1"><h3>홈 화면에서도 한눈에</h3><p class="small muted" style="margin-top:5px">${window.Android?'이번 주 운동 · 최근 기록 · 바로 시작':'Safari에서 설치해서 바로 열기'}</p></div></div>${button(window.Android?'widget':'installWeb',icon('plus')+(window.Android?'홈 화면 위젯 추가':'홈 화면 아이콘 추가'),'primary','style="margin-top:20px"')}<p class="micro" style="margin-top:12px">${window.Android?'홈 화면을 길게 눌러 위젯 → 리프트로그를 선택해도 돼요.':'Safari 공유 → 홈 화면에 추가. 웹앱에는 아이폰 네이티브 위젯과 잠금 화면 타이머 알림이 없습니다.'}</p></div><div class="section card"><h3>내 기록, 안전하게</h3><div class="setting-row"><div><p style="margin-top:0">계정 없이 이 기기에 저장됩니다.<br>기기를 바꾸기 전에 파일로 백업하세요.</p></div></div><div class="row" style="margin-top:15px">${button('export',icon('download')+' 백업 저장','secondary')}${button('import',icon('upload')+' 복원','secondary')}</div></div><div class="section">${button('reset','모든 데이터 초기화','text-btn danger')}</div><div class="app-footer">리프트로그 1.2.0<br>LIFTLOG · A LITTLE STRONGER, A LITTLE HAPPIER.</div>`;}
+function settings(){return `${head()}<div class="eyebrow">MAKE IT YOURS</div><h1 style="margin-top:9px">나에게 맞게</h1><p class="welcome-line">익숙한 단위, 편안한 운동의 리듬.</p>${loadError?'<div class="section tip danger">저장된 데이터 형식을 읽지 못했습니다. 원본은 보존되어 있으며, 백업 파일로 복원하거나 초기화할 수 있습니다.</div>':''}<div class="section card"><div class="setting-row"><div><h3>무게 단위</h3><p>기존 기록도 자동으로 환산돼요</p></div><div class="segmented">${['kg','lb'].map(u=>button('setUnit',u,u===data.settings.unit?'active':'',`data-unit="${u}"`)).join('')}</div></div><div class="setting-row"><div><h3>자동 휴식 타이머</h3><p>세트를 완료하면 바로 시작</p></div>${button('toggleRest','<span></span>',`switch ${data.settings.autoRest?'on':''}`,`role="switch" aria-label="자동 휴식 타이머" aria-checked="${data.settings.autoRest}"`)}</div><div class="setting-row"><div><h3>기본 휴식 시간</h3><p>나의 운동 속도에 맞게</p></div><select id="rest-setting" aria-label="기본 휴식 시간">${[30,45,60,90,120,180,300,...([30,45,60,90,120,180,300].includes(data.settings.rest)?[]:[data.settings.rest])].sort((a,b)=>a-b).map(n=>`<option value="${n}" ${n===data.settings.rest?'selected':''}>${n}초</option>`).join('')}</select></div><div class="setting-row"><div><h3>주간 운동 목표</h3><p>꾸준히 지킬 수 있는 약속</p></div><select id="goal-setting" aria-label="주간 운동 목표">${Array.from({length:7},(_,i)=>`<option value="${i+1}" ${data.settings.goal===i+1?'selected':''}>주 ${i+1}회</option>`).join('')}</select></div></div><div class="section card"><div class="row"><div class="routine-art blue">${icon('widget')}</div><div style="flex:1"><h3>홈 화면에서도 한눈에</h3><p class="small muted" style="margin-top:5px">${window.Android?'이번 주 운동 · 최근 기록 · 바로 시작':'Safari에서 설치해서 바로 열기'}</p></div></div>${button(window.Android?'widget':'installWeb',icon('plus')+(window.Android?'홈 화면 위젯 추가':'홈 화면 아이콘 추가'),'primary','style="margin-top:20px"')}<p class="micro" style="margin-top:12px">${window.Android?'홈 화면을 길게 눌러 위젯 → 리프트로그를 선택해도 돼요.':'Safari 공유 → 홈 화면에 추가. 웹앱에는 아이폰 네이티브 위젯과 잠금 화면 타이머 알림이 없습니다.'}</p></div><div class="section card"><h3>내 기록, 안전하게</h3><div class="setting-row"><div><p style="margin-top:0">계정 없이 이 기기에 저장됩니다.<br>기기를 바꾸기 전에 파일로 백업하세요.</p></div></div><div class="row" style="margin-top:15px">${button('export',icon('download')+' 백업 저장','secondary')}${button('import',icon('upload')+' 복원','secondary')}</div></div><div class="section">${button('reset','모든 데이터 초기화','text-btn danger')}</div><div class="app-footer">리프트로그 1.3.0<br>LIFTLOG · A LITTLE STRONGER, A LITTLE HAPPIER.</div>`;}
 function render(){
  const screens={home,routines:routinesPage,calendar,workout,insights,settings};
  $('#app').innerHTML=`<main class="screen">${(screens[page]||home)()}</main>${page==='workout'?'':nav()}`;
  timerUI();
 }
-function sheet(title,body,kind='generic'){modal=kind;$('#overlay').innerHTML=`<div class="overlay-backdrop"><section class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="handle"></div><div class="sheet-head"><h2>${title}</h2>${button('close',icon('close'),'icon-btn','aria-label="닫기"')}</div>${body}</section></div>`;}
+function sheet(title,body,kind='generic'){modal=kind;$('#overlay').innerHTML=`<div class="overlay-backdrop"><section class="sheet" data-kind="${kind}" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="handle"></div><div class="sheet-head"><h2>${title}</h2>${button('close',icon('close'),'icon-btn','aria-label="닫기"')}</div><div class="sheet-content">${body}</div></section></div>`;}
 function closeSheet(){modal=null;$('#overlay').innerHTML='';}
 function confirmSheet(title,desc,action,label='확인'){sheet(title,`<p class="muted">${desc}</p><div class="sheet-actions">${button('close','돌아가기','secondary')}${button(action,label,'primary')}</div>`,'confirm');}
 function startWorkout(date=dateKey(),routine=null){
@@ -118,10 +369,16 @@ function startWorkout(date=dateKey(),routine=null){
 }
 function cryptoId(){return 's_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9);}
 function newExercise(id){const ex=exercise(id),last=lastExercise(id),defaultReps=ex.kind==='duration'?(ex.muscle==='유산소'?600:60):10;return {id,sets:last?last.sets.filter(s=>s.done).map(s=>({...s,done:false})):Array.from({length:ex.kind==='duration'?1:3},()=>({weightKg:ex.weight||0,reps:defaultReps,done:false}))};}
-function openPicker(){pickerFilter='전체';pickerQuery='';picked=new Set();sheet('운동 선택',`<div class="search">${icon('search')}<input id="exercise-search" aria-label="운동 검색" placeholder="운동 이름으로 검색"></div><div class="filters" id="picker-filters"></div><div id="picker-results"></div>${button('customExercise',icon('plus')+'나만의 운동 만들기','text-btn')}${button('addPicked','운동 추가','primary','id="picker-add"')}`,'picker');refreshPicker();}
+function openPicker(){pickerFilter='전체';pickerQuery='';picked=new Set();sheet('운동 선택',`<div class="picker-toolbar"><div class="search">${icon('search')}<input id="exercise-search" type="search" enterkeyhint="done" autocomplete="off" aria-label="운동 검색" placeholder="운동·장비 검색 (예: 스쿼트, 덤벨)"></div><div class="filters" id="picker-filters"></div><p class="micro" id="picker-count"></p></div><div class="picker-list"><div id="picker-results"></div>${button('customExercise',icon('plus')+'나만의 운동 만들기','text-btn')}</div><div class="picker-footer">${button('addPicked','운동 추가','primary','id="picker-add"')}</div>`,'picker');refreshPicker();}
+function searchExercises(query=pickerQuery,filter=pickerFilter){
+ const normalize=v=>v.toLowerCase().replace(/[^a-z0-9가-힣]/g,'');
+ const aliases={latpull:'렛풀다운 lat pulldown',squat:'squat 백스쿼트',bench:'bench press 벤치프레스',deadlift:'deadlift 데드',hipthrust:'힙쓰러스트 힙스러스트 hip thrust',lateral:'사레레 레터럴 lateral raise',rdl:'루마니안 romanian deadlift',ohp:'밀리터리프레스 shoulder press',pushup:'push up 푸쉬업',pullup:'pull up 턱걸이',run:'런닝머신 트레드밀 treadmill'};
+ const terms=query.trim().split(/\s+/).map(normalize).filter(Boolean);
+ return allExercises().filter(e=>(filter==='전체'||e.muscle===filter)&&terms.every(t=>normalize(e.name+' '+e.equipment+' '+e.muscle+' '+e.id+' '+(aliases[e.id]||'')).includes(t)));
+}
 function refreshPicker(){
  $('#picker-filters').innerHTML=['전체','가슴','등','하체','어깨','팔','코어','유산소','기타'].map(f=>button('filter',f,`pill ${f===pickerFilter?'active':''}`,`data-filter="${f}"`)).join('');
- const list=allExercises().filter(e=>(pickerFilter==='전체'||e.muscle===pickerFilter)&&e.name.toLowerCase().includes(pickerQuery.toLowerCase()));
+ const list=searchExercises();if($('#picker-count'))$('#picker-count').textContent=`${list.length}개 운동 · 여러 개를 골라 한 번에 추가하세요`;
  $('#picker-results').innerHTML=list.map(e=>`<button class="exercise-choice ${picked.has(e.id)?'selected':''}" data-action="pickExercise" data-id="${esc(e.id)}" aria-pressed="${picked.has(e.id)}"><span class="routine-art">${icon(e.kind==='duration'?'clock':'dumbbell')}</span><div><h3>${esc(e.name)}</h3><p>${esc(e.muscle)} · ${esc(e.equipment||'직접 추가')} · ${e.kind==='duration'?'시간':e.kind==='bodyweight'?'맨몸':'중량'}</p></div><span class="box">${icon('check')}</span></button>`).join('')||empty('검색 결과가 없어요','다른 이름으로 검색하거나 직접 추가해보세요.','search');
  $('#picker-add').textContent=picked.size?`${picked.size}개 운동 추가`:'운동을 선택해 주세요';$('#picker-add').disabled=!picked.size;
 }
@@ -203,8 +460,11 @@ const actions={
  addPicked:()=>{if(data.draft.exercises.length+picked.size>60){toast('한 번에 최대 60개 운동까지 기록할 수 있어요.');return;}for(const id of picked){if(!data.draft.exercises.some(e=>e.id===id))data.draft.exercises.push(newExercise(id));}save();closeSheet();render();},
  customExercise,
  saveCustom:()=>{const name=$('#custom-name').value.trim();if(!name){toast('운동 이름을 입력해 주세요.');return;}if(data.customExercises.length>=500){toast('직접 추가한 운동은 최대 500개까지 저장할 수 있어요.');return;}if(data.draft.exercises.length>=60){toast('최대 60개 운동까지 기록할 수 있어요.');return;}const e={id:'custom_'+cryptoId(),name,muscle:$('#custom-muscle').value,kind:$('#custom-kind').value,equipment:'직접 추가',weight:0};data.customExercises.push(e);data.draft.exercises.push(newExercise(e.id));save();closeSheet();render();},
- addSet:b=>{const e=data.draft.exercises[Number(b.dataset.index)];if(e.sets.length>=100){toast('운동당 최대 100세트까지 기록할 수 있어요.');return;}e.sets.push({...e.sets[e.sets.length-1],done:false});save();render();},
- checkSet:b=>{if(b.closest('.set-row')&&[...b.closest('.set-row').querySelectorAll('input')].some(i=>!i.checkValidity()||i.value.trim()==='')){toast('유효한 무게와 횟수 또는 시간을 입력해 주세요.');return;}const e=data.draft.exercises[Number(b.dataset.ex)],s=e.sets[Number(b.dataset.set)];if(!s.done&&(!Number.isInteger(s.reps)||s.reps<=0||s.reps>100000||!Number.isFinite(s.weightKg)||s.weightKg<0||s.weightKg>10000)){toast('유효한 무게와 횟수 또는 시간을 입력해 주세요.');return;}s.done=!s.done;if(s.done){try{window.Android?Android.haptic():navigator.vibrate?.(30);}catch(e){}if(data.settings.autoRest)startTimer();}save();render();},
+ addSet:b=>addSets(Number(b.dataset.index),1),
+ addThreeSets:b=>addSets(Number(b.dataset.index),3),
+ deleteSet:b=>deleteSet(Number(b.dataset.ex),Number(b.dataset.set)),
+ undoSet:undoDeletedSet,
+ checkSet:b=>{if(b.closest('.set-row')&&[...b.closest('.set-row').querySelectorAll('input')].some(i=>!i.checkValidity()||(i.value.trim()===''&&i.dataset.field!=='weight'))){toast('유효한 무게와 횟수 또는 시간을 입력해 주세요.');return;}const e=data.draft.exercises[Number(b.dataset.ex)],s=e.sets[Number(b.dataset.set)];if(!s.done&&(!Number.isInteger(s.reps)||s.reps<=0||s.reps>100000||!Number.isFinite(s.weightKg)||s.weightKg<0||s.weightKg>10000)){toast('유효한 무게와 횟수 또는 시간을 입력해 주세요.');return;}s.done=!s.done;if(s.done){try{window.Android?Android.haptic():navigator.vibrate?.(30);}catch(e){}if(data.settings.autoRest)startTimer();}save();render();},
  exerciseMenu:b=>{const i=Number(b.dataset.index),e=data.draft.exercises[i];sheet(esc(exercise(e.id).name),`${button('removeLastSet','마지막 세트 삭제','secondary full',`data-index="${i}" ${e.sets.length<=1?'disabled':''}`)}${button('removeExercise',icon('trash')+' 운동 삭제','secondary danger full',`data-index="${i}" style="margin-top:12px"`)}`,'exerciseMenu');},
  removeLastSet:b=>{const e=data.draft.exercises[Number(b.dataset.index)];if(e.sets.length>1)e.sets.pop();save();closeSheet();render();},
  removeExercise:b=>{data.draft.exercises.splice(Number(b.dataset.index),1);save();closeSheet();render();},
@@ -247,6 +507,7 @@ document.addEventListener('input',event=>{
  if(el.dataset.field&&data.draft){
   const s=data.draft.exercises[Number(el.dataset.ex)].sets[Number(el.dataset.set)],n=Number(el.value),valid=el.value.trim()!==''&&Number.isFinite(n)&&n>=0;
   if(s.done){s.done=false;el.closest('.set-row').classList.remove('done');el.closest('.set-row').querySelector('.check').classList.remove('done');el.closest('.set-row').querySelector('.check').setAttribute('aria-pressed','false');save();}
+  if(el.value.trim()===''&&el.dataset.field==='weight'){s.weightKg=0;el.setCustomValidity('');save();return;}
   if(!valid){el.setCustomValidity('숫자를 입력해 주세요.');return;}
   if(el.dataset.field==='weight'){if(asKg(n)>10000){el.setCustomValidity('무게가 너무 큽니다.');return;}s.weightKg=asKg(n);}else{if(!Number.isInteger(n)||n>100000){el.setCustomValidity('정수로 입력해 주세요.');return;}s.reps=n;}
   el.setCustomValidity('');if(s.done){s.done=false;el.closest('.set-row').classList.remove('done');el.closest('.set-row').querySelector('.check').classList.remove('done');el.closest('.set-row').querySelector('.check').setAttribute('aria-pressed','false');}save();
@@ -265,3 +526,50 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();if(e.ke
 if(data.timer&&!data.timer.paused&&timerSeconds()===0){data.timer=null;save();}
 render();
 if(loadError){page='settings';render();toast('저장 데이터를 읽지 못했습니다. 설정에서 확인해 주세요.');}
+
+
+let deletedSet=null,swipeGesture=null,openSwipe=null;
+function addSets(index,count=1){
+ const e=data.draft?.exercises[index];if(!e)return;
+ if(e.sets.length+count>100){toast('운동당 최대 100세트까지 기록할 수 있어요.');return;}
+ const template=e.sets.at(-1)||{weightKg:0,reps:10,done:false};
+ for(let i=0;i<count;i++)e.sets.push({...template,done:false});
+ const y=window.scrollY;save();render();window.scrollTo(0,y);
+ const card=document.querySelectorAll?.('.exercise-card')[index];
+ card?.querySelector('.add-set')?.scrollIntoView?.({block:'nearest',behavior:'smooth'});
+}
+function deleteSet(index,setIndex){
+ const e=data.draft?.exercises[index];if(!e||!e.sets[setIndex])return;
+ if(e.sets.length<=1){toast('운동마다 최소 한 세트는 남겨 주세요.');return;}
+ deletedSet={draftId:data.draft.id,exercise:e,index:setIndex,set:{...e.sets[setIndex]}};
+ e.sets.splice(setIndex,1);const y=window.scrollY;save();render();window.scrollTo(0,y);
+ toast('세트를 삭제했어요.');$('#toast').innerHTML='세트를 삭제했어요. '+button('undoSet','되돌리기','undo-set');
+}
+function undoDeletedSet(){
+ const d=deletedSet;if(!d||data.draft?.id!==d.draftId||!data.draft.exercises.includes(d.exercise))return;
+ if(d.exercise.sets.length>=100){toast('세트가 가득 찼어요.');return;}
+ d.exercise.sets.splice(d.index,0,d.set);deletedSet=null;save();render();toast('세트를 복원했어요.');
+}
+document.addEventListener('focusin',event=>{
+ const el=event.target;
+ if(el.matches?.('input[data-field]')){el.select();setTimeout(()=>el.select(),0);}
+ if(el.matches?.('input,textarea'))setTimeout(()=>el.scrollIntoView?.({block:'nearest',behavior:'smooth'}),250);
+});
+document.addEventListener('focusout',event=>{const el=event.target;if(el.dataset.field&&el.value.trim()===''){const set=data.draft?.exercises[Number(el.dataset.ex)]?.sets[Number(el.dataset.set)];if(set&&el.dataset.field==='reps'){el.value=set.reps||'';el.setCustomValidity('');}}});
+document.addEventListener('pointerdown',event=>{
+ const row=event.target.closest?.('.set-row');
+ if(openSwipe&&(!row||row!==openSwipe)){openSwipe.style.transform='';openSwipe=null;}
+ if(!row||event.target.closest('button')||(event.target.matches?.('input')&&event.target===document.activeElement)||event.isPrimary===false)return;
+ swipeGesture={row,x:event.clientX,y:event.clientY,active:false};
+});
+document.addEventListener('pointermove',event=>{
+ const g=swipeGesture;if(!g)return;const dx=event.clientX-g.x,dy=event.clientY-g.y;
+ if(!g.active&&Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){swipeGesture=null;return;}
+ if(dx < -12 && Math.abs(dx)>Math.abs(dy)*1.3)g.active=true;
+ if(g.active){event.preventDefault();g.row.style.transform=`translateX(${Math.max(-104,Math.min(0,dx))}px)`;}
+},{passive:false});
+function endSwipe(event){const g=swipeGesture;swipeGesture=null;if(!g)return;if(g.active&&event.clientX-g.x < -48){g.row.style.transform='translateX(-96px)';openSwipe=g.row;document.activeElement?.blur?.();}else g.row.style.transform='';}
+document.addEventListener('pointerup',endSwipe);
+document.addEventListener('pointercancel',()=>{if(swipeGesture)swipeGesture.row.style.transform='';swipeGesture=null;});
+function syncViewport(){const v=window.visualViewport;if(!v)return;document.documentElement.style.setProperty('--vv-height',v.height+'px');document.documentElement.style.setProperty('--vv-top',v.offsetTop+'px');document.documentElement.classList.toggle('keyboard-open',window.innerHeight-v.height>100);}
+window.visualViewport?.addEventListener('resize',syncViewport);window.visualViewport?.addEventListener('scroll',syncViewport);window.addEventListener?.('resize',syncViewport);syncViewport();

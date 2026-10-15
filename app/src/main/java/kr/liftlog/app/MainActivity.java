@@ -21,6 +21,7 @@ public class MainActivity extends Activity {
         super.onCreate(state);
         getWindow().setStatusBarColor(Color.rgb(255,247,250));
         getWindow().setNavigationBarColor(Color.rgb(255,247,250));
+        WebView.setWebContentsDebuggingEnabled((getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)!=0);
         web = new WebView(this);
         web.setBackgroundColor(Color.rgb(255,247,250));
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
@@ -44,8 +45,11 @@ public class MainActivity extends Activity {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) { return true; }
             @Override public void onPageFinished(WebView view,String url) { handleLaunch(getIntent()); }
         });
-        setContentView(web);
-        web.setOnApplyWindowInsetsListener((view,insets)-> {
+        android.widget.FrameLayout root = new android.widget.FrameLayout(this);
+        root.addView(web,new android.widget.FrameLayout.LayoutParams(-1,-1));
+        if(Build.VERSION.SDK_INT>=30)getWindow().setDecorFitsSystemWindows(false);
+        setContentView(root);
+        root.setOnApplyWindowInsetsListener((view,insets)-> {
             if(Build.VERSION.SDK_INT>=30) {
                 android.graphics.Insets bars=insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
                 android.graphics.Insets ime=insets.getInsets(WindowInsets.Type.ime());
@@ -53,6 +57,7 @@ public class MainActivity extends Activity {
             } else view.setPadding(insets.getSystemWindowInsetLeft(),insets.getSystemWindowInsetTop(),insets.getSystemWindowInsetRight(),insets.getSystemWindowInsetBottom());
             return Build.VERSION.SDK_INT>=30 ? WindowInsets.CONSUMED : insets.consumeSystemWindowInsets();
         });
+        root.requestApplyInsets();
         web.loadUrl("https://app.liftlog.local/");
     }
     private void handleLaunch(Intent intent) {
@@ -114,3 +119,4 @@ public class MainActivity extends Activity {
         }catch(Exception e){message("파일을 읽거나 저장하지 못했습니다. 다시 시도해 주세요.");}
     }
 }
+

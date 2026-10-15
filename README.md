@@ -4,6 +4,17 @@
 
 **현재 배포 상태:** GitHub Actions에서 Android APK 컴파일, 핵심 데이터 로직 검사, APK v2 서명 검사까지 통과했습니다. [APK 다운로드](https://github.com/wndnjs681-ctrl/workout-application/actions/runs/37577328253/artifacts/11463490777)에서 ZIP을 내려받아 압축을 풀고 `Liftlog-1.2.0.apk`를 설치하세요. GitHub 로그인이 필요하고 이 파일은 2026년 11월 6일까지 보관됩니다. 실기기 설치와 실제 위젯 작동은 아직 검증하지 않았습니다.
 
+## 1.3.0 — 운동 선택과 세트 입력 개선
+
+- 운동 44 → 294개. 이름·부위·장비·일부 영문/별칭 검색.
+- 키보드가 뜨면 검색창과 추가 버튼을 남기고 결과만 스크롤합니다. Android 창 여백을 한 번만 적용합니다.
+- 0kg은 입력 안내로 표시하고, 기존 무게/횟수는 포커스하면 전체 선택합니다.
+- 세트를 왼쪽으로 밀어 삭제하고 알림의 되돌리기로 복원할 수 있습니다. 마지막 한 세트는 남깁니다.
+- 넓은 세트 추가 버튼은 이전 값을 복사하며, +3세트도 한 번에 추가합니다.
+- Android 잠금 화면/알림에 시스템 Chronometer로 남은 시간이 갱신됩니다. 알림 허용과 휴식 타이머 진행 채널의 잠금 화면 표시가 켜져 있어야 합니다. 기기 설정이 숨기는 알림을 앱에서 강제로 노출하지는 않습니다.
+
+기존 기록/백업 형식과 운동 ID는 유지됩니다. 1.3.0 APK를 기존 앱 위에 설치하세요. 기기에 따라 키보드/잠금 화면 표현이 다르므로 실기기 확인은 별도로 필요합니다.
+
 ## iOS 단독 앱
 
 Safari 없이 실행되는 iOS 프로젝트는 [ios/README.md](ios/README.md)에 있습니다. 운동 화면을 앱에 포함하고 iOS 파일 백업, 로컬 타이머 알림, WidgetKit 위젯을 연결했습니다. Mac과 무료 Apple ID가 있으면 `LiftlogPersonal` 스킴으로 본인 기기에서 임시 테스트할 수 있습니다. 위젯이 포함된 `Liftlog` 스킴과 TestFlight/App Store 배포에는 Apple Developer Program 계정 및 서명이 필요합니다. GitHub Actions의 서명 없는 빌드·시뮬레이터 파일은 아이폰에 직접 설치할 수 있는 IPA가 아닙니다.
@@ -89,3 +100,4 @@ JavaScript 문법 검사, 11개 Android manifest / 리소스 XML 파싱, 빌드 
 - `MainActivity.java`: 로컬 WebView, 기기 저장, 파일 백업 / 복원, 위젯 추가 연결.
 - `RestTimerService.java`: 화면 밖에서도 진행되는 짧은 휴식 타이머.
 - `WorkoutWidget.java`: 안드로이드 홈 화면 위젯.
+

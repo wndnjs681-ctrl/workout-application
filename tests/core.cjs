@@ -48,3 +48,21 @@ const listeners={};const storage={};const context={console,Intl,Date,Math,Number
  const previous=run('JSON.stringify(data)');run("importHistory('missing')");assert.equal(run('JSON.stringify(data)'),previous);console.log('PASS 없는 기록 거부 및 데이터 보존');
  run("data.draft.exercises[0].sets=Array.from({length:100},()=>({weightKg:40,reps:8,done:false}));save()");const atLimit=run('JSON.stringify(data)');run("importHistory('old','append')");assert.equal(run('JSON.stringify(data)'),atLimit);console.log('PASS 세트 한도 초과 시 기존 입력 보존');
  run("data=fresh();historySheet()");test('첫 사용자 빈 기록 안내',"document.querySelector('#history-results').innerHTML.includes('불러올 운동 기록이 아직 없어요')");
+
+// Upgrade regressions: catalog compatibility, search, add/delete and undo semantics.
+test('기본 운동 294개',"library.length===294");
+test('운동 ID 중복 없음',"new Set(library.map(e=>e.id)).size===library.length");
+test('장비와 부위 복합 검색',"searchExercises('케이블 등').length>5&&searchExercises('케이블 등').every(e=>e.muscle==='등'&&e.equipment==='케이블')");
+test('띄어쓰기 없는 운동 검색',"searchExercises('힙어브덕션').length===2");
+test('다른 한글 표기 검색',"searchExercises('렛풀다운')[0].id==='latpull'");
+run("data=fresh();startWorkout(dateKey(),routines[0]);data.draft.exercises[0].sets[2]={weightKg:52.5,reps:8,done:true};addSets(0)");
+test('세트 추가 이전 값 복사 및 미완료',"data.draft.exercises[0].sets.length===4&&data.draft.exercises[0].sets[3].weightKg===52.5&&data.draft.exercises[0].sets[3].reps===8&&!data.draft.exercises[0].sets[3].done");
+run('addSets(0,3)');test('3세트 한 번에 추가',"data.draft.exercises[0].sets.length===7&&data.draft.exercises[0].sets.slice(-3).every(s=>s.weightKg===52.5&&!s.done)");
+run('deleteSet(0,2)');test('선택한 세트만 삭제',"data.draft.exercises[0].sets.length===6&&data.draft.exercises[0].sets[2].done===false");
+run('undoDeletedSet()');test('삭제 복원 위치 값 완료 상태 보존',"data.draft.exercises[0].sets.length===7&&data.draft.exercises[0].sets[2].weightKg===52.5&&data.draft.exercises[0].sets[2].done");
+run('undoDeletedSet()');test('복원 중복 방지',"data.draft.exercises[0].sets.length===7");
+run('data.draft.exercises[0].sets=[{weightKg:0,reps:10,done:false}];deleteSet(0,0)');test('마지막 한 세트 보호',"data.draft.exercises[0].sets.length===1");
+run('data.draft.exercises[0].sets=Array.from({length:99},()=>({weightKg:20,reps:10,done:false}));addSets(0,3)');test('빠른 추가 100세트 한도 보호',"data.draft.exercises[0].sets.length===99");
+run('addSets(0);addSets(0)');test('한 세트 추가 100세트 한도 보호',"data.draft.exercises[0].sets.length===100");
+run('deleteSet(0,0);const oldId=data.draft.id;data.draft.id="another-draft";undoDeletedSet()');test('다른 운동에 잘못 복원하지 않음',"data.draft.exercises[0].sets.length===99");
+test('확장 운동 포함 백업 검증',"(()=>{const x=fresh();x.draft={id:'test',date:dateKey(),name:'test',notes:'',startedAt:Date.now(),exercises:[newExercise('ex_001')]};return validate(x).draft.exercises[0].id==='ex_001';})()");

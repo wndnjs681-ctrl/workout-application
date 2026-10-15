@@ -1,0 +1,6 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="8dp">
+ <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="나를 위한 잠깐의 휴식 ♡" android:textSize="14sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary" />
+ <Chronometer android:id="@+id/rest_clock" android:layout_width="match_parent" android:layout_height="58dp" android:gravity="center" android:textSize="42sp" android:textStyle="bold" android:fontFamily="sans-serif-medium" android:textColor="?android:attr/textColorPrimary" />
+ <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="남은 시간 · 끝나면 소리와 진동으로 알려드려요" android:textSize="12sp" android:textColor="?android:attr/textColorSecondary" />
+</LinearLayout>
