@@ -103,7 +103,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Install device test runtime
         run: python3 -m pip install websocket-client --break-system-packages
-      - name: Check keyboard, visible countdown and notification skip
+      - name: Check keyboard and countdown without emulator launcher interference
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
