@@ -110,7 +110,7 @@ jobs:
           arch: x86_64
           profile: pixel_4
           disable-animations: true
-          script: python3 tests/android-device.py
+          script: python3 tests/run-android-check.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

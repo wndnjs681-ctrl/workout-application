@@ -51,7 +51,8 @@ def find_input():
  if 'dumped' not in result:return None
  xml=adb('shell','cat','/sdcard/liftlog-ui.xml')
  root=ET.fromstring(xml)
- return next((n for n in root.iter('node') if n.attrib.get('class')=='android.widget.EditText'),None)
+ (out/'android-picker-accessibility.xml').write_text(xml)
+ return next((n for n in root.iter('node') if n.attrib.get('class')=='android.widget.EditText' and '운동 검색' in (n.attrib.get('content-desc','')+' '+n.attrib.get('text',''))),None)
 node=wait(find_input,seconds=60)
 base_height=js('innerHeight')
 x1,y1,x2,y2=map(int,re.findall(r'\d+',node.attrib['bounds']))

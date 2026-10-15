@@ -391,8 +391,8 @@ function render(){
  $('#app').innerHTML=`<main class="screen ${page==='workout'?'workout-screen':''}">${(screens[page]||home)()}</main>${page==='workout'?'':nav()}`;
  timerUI();
 }
-function sheet(title,body,kind='generic'){modal=kind;$('#overlay').innerHTML=`<div class="overlay-backdrop"><section class="sheet" data-kind="${kind}" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="handle"></div><div class="sheet-head"><h2>${title}</h2>${button('close',icon('close'),'icon-btn','aria-label="닫기"')}</div><div class="sheet-content">${body}</div></section></div>`;}
-function closeSheet(){if(modal==='finish'&&finishResume&&data.draft){const c=normalizeClock();c.paused=false;c.anchorMs=Date.now();c.lastSeenMs=Date.now();finishResume=false;save();}modal=null;$('#overlay').innerHTML='';}
+function sheet(title,body,kind='generic'){modal=kind;$('#app').inert=true;$('#overlay').innerHTML=`<div class="overlay-backdrop"><section class="sheet" data-kind="${kind}" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="handle"></div><div class="sheet-head"><h2>${title}</h2>${button('close',icon('close'),'icon-btn','aria-label="닫기"')}</div><div class="sheet-content">${body}</div></section></div>`;}
+function closeSheet(){$('#app').inert=false;if(modal==='finish'&&finishResume&&data.draft){const c=normalizeClock();c.paused=false;c.anchorMs=Date.now();c.lastSeenMs=Date.now();finishResume=false;save();}modal=null;$('#overlay').innerHTML='';}
 function confirmSheet(title,desc,action,label='확인'){sheet(title,`<p class="muted">${desc}</p><div class="sheet-actions">${button('close','돌아가기','secondary')}${button(action,label,'primary')}</div>`,'confirm');}
 function startWorkout(date=dateKey(),routine=null){
  if(loadError){page='settings';render();toast('데이터 복원 또는 초기화를 먼저 해주세요.');return;}
