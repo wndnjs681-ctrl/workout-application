@@ -103,7 +103,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Install device test runtime
         run: python3 -m pip install websocket-client --break-system-packages
-      - name: Check dialog search keyboard and native countdown
+      - name: Check keyboard and countdown; report OS action accessibility limits
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
