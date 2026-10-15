@@ -101,7 +101,8 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Install device test runtime
         run: python3 -m pip install websocket-client --break-system-packages
-      - uses: reactivecircus/android-emulator-runner@v2
+      - name: Check actual keyboard, notification and lock screen
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
           arch: x86_64
