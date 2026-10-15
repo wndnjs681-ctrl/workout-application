@@ -29,7 +29,7 @@ final class WorkoutController: UIViewController, WKScriptMessageHandler, WKNavig
     private var timerGeneration = 0
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(red: 1, green: 0.97, blue: 0.98, alpha: 1)
+        view.backgroundColor = UIColor(red: 0.035, green: 0.047, blue: 0.039, alpha: 1)
         let controller = WKUserContentController()
         controller.add(self, name: "native")
         let raw = WorkoutStore.raw
@@ -147,3 +147,4 @@ final class WorkoutController: UIViewController, WKScriptMessageHandler, WKNavig
         present(alert, animated: true)
     }
 }
+

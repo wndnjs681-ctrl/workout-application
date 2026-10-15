@@ -34,7 +34,7 @@ struct WorkoutProvider: TimelineProvider {
 }
 struct WorkoutWidgetView: View {
     let entry: WorkoutEntry
-    private let berry = Color(red: 0.68, green: 0.18, blue: 0.41)
+    private let berry = Color(red: 0.784, green: 0.98, blue: 0.443)
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
             HStack { Text("리프트로그").font(.caption.bold()); Spacer(); Image(systemName: "heart.fill") }
@@ -49,7 +49,7 @@ struct WorkoutWidgetView: View {
 }
 extension View {
     @ViewBuilder func widgetBackground() -> some View {
-        let color = Color(red: 1, green: 0.97, blue: 0.98)
+        let color = Color(red: 0.082, green: 0.102, blue: 0.086)
         if #available(iOS 17.0, *) { self.containerBackground(color, for: .widget) }
         else { self.background(color) }
     }
@@ -64,3 +64,4 @@ struct LiftlogWidget: Widget {
             .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
+

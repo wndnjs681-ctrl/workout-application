@@ -1,4 +1,4 @@
-const CACHE='liftlog-pwa-1.3.0-polish';
+const CACHE='liftlog-pwa-1.3.1-lime';
 const assets=['./','./index.html','./style.css','./theme.css','./app.js','./pwa.js','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(assets.map(p=>new URL(p,self.registration.scope).href))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('liftlog-pwa-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));

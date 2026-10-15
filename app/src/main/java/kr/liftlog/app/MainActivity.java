@@ -24,11 +24,11 @@ public class MainActivity extends Activity {
     };
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
-        getWindow().setStatusBarColor(Color.rgb(255,247,250));
-        getWindow().setNavigationBarColor(Color.rgb(255,247,250));
+        getWindow().setStatusBarColor(Color.rgb(9,12,10));
+        getWindow().setNavigationBarColor(Color.rgb(9,12,10));
         WebView.setWebContentsDebuggingEnabled((getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)!=0);
         web = new WebView(this);
-        web.setBackgroundColor(Color.rgb(255,247,250));
+        web.setBackgroundColor(Color.rgb(9,12,10));
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
         web.getSettings().setJavaScriptEnabled(true);
         web.getSettings().setDomStorageEnabled(true);
