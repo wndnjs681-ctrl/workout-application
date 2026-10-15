@@ -17,6 +17,9 @@ def wait(check,seconds=30):
 adb('install','-r','dist/Liftlog-1.3.0.apk')
 adb('shell','pm','grant','kr.liftlog.app','android.permission.POST_NOTIFICATIONS')
 adb('shell','settings','put','secure','show_ime_with_hard_keyboard','1')
+print('Lock notification defaults:',adb('shell','settings','get','secure','lock_screen_show_notifications'),adb('shell','settings','get','secure','lock_screen_show_silent_notifications'),flush=True)
+adb('shell','settings','put','secure','lock_screen_show_notifications','1')
+adb('shell','settings','put','secure','lock_screen_show_silent_notifications','1')
 adb('shell','am','start','-n','kr.liftlog.app/.MainActivity')
 pid=wait(lambda:adb('shell','pidof','kr.liftlog.app'))
 wait(lambda:'webview_devtools_remote_'+pid in adb('shell','cat','/proc/net/unix'))
@@ -69,6 +72,20 @@ adb('shell','cmd','statusbar','collapse');adb('shell','input','keyevent','3');ti
 # Confirm foreground timer survives leaving the activity.
 assert 'RestTimerService' in adb('shell','dumpsys','activity','services','kr.liftlog.app')
 print('PASS native foreground countdown and custom notification while app is in background')
-adb('shell','locksettings','set-disabled','false');adb('shell','input','keyevent','26');time.sleep(2);adb('shell','input','keyevent','26');time.sleep(2);shot('android-lockscreen-countdown.png')
+adb('shell','locksettings','set-disabled','false');adb('shell','input','keyevent','26');time.sleep(2);adb('shell','input','keyevent','26');time.sleep(3);shot('android-lockscreen-countdown.png')
+# Verify notification skip reaches the app through the service broadcast.
+adb('shell','wm','dismiss-keyguard');adb('shell','am','start','-n','kr.liftlog.app/.MainActivity');time.sleep(1)
+adb('shell','cmd','statusbar','expand-notifications');time.sleep(1)
+def find_skip():
+ result=adb('shell','uiautomator','dump','/sdcard/liftlog-notifications.xml')
+ if 'dumped' not in result:return None
+ xml=adb('shell','cat','/sdcard/liftlog-notifications.xml')
+ return next((n for n in ET.fromstring(xml).iter('node') if n.attrib.get('text')=='건너뛰기'),None)
+node=wait(find_skip,seconds=30)
+x1,y1,x2,y2=map(int,re.findall(r'\d+',node.attrib['bounds']))
+adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2));adb('shell','cmd','statusbar','collapse')
+wait(lambda:js('data.timer===null'))
+assert json.loads(js('Android.load()'))['timer'] is None
+print('PASS notification skip clears native storage and in-app rest timer',flush=True)
 (out/'android-native-verification.txt').write_text('PASS actual keyboard viewport\nPASS foreground timer notification in background\nNotification and lock-screen screenshots captured; display depends on device notification settings.\n')
 ws.close()

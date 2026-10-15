@@ -9,11 +9,11 @@ public class RestTimerService extends Service {
     private final Handler handler=new Handler(Looper.getMainLooper());
     private long deadline;
     private PowerManager.WakeLock wakeLock;
-    private static final String CHANNEL="rest_countdown", DONE="rest_done";
+    private static final String CHANNEL="rest_countdown_visible_v2", DONE="rest_done";
     @Override public void onCreate(){super.onCreate();
         NotificationManager manager=getSystemService(NotificationManager.class);
-        NotificationChannel countdown=new NotificationChannel(CHANNEL,"휴식 타이머 진행",NotificationManager.IMPORTANCE_LOW);
-        countdown.setSound(null,null);countdown.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);manager.createNotificationChannel(countdown);
+        NotificationChannel countdown=new NotificationChannel(CHANNEL,"휴식 타이머 진행",NotificationManager.IMPORTANCE_DEFAULT);
+        countdown.setSound(null,null);countdown.enableVibration(false);countdown.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);manager.createNotificationChannel(countdown);
         manager.createNotificationChannel(new NotificationChannel(DONE,"휴식 완료",NotificationManager.IMPORTANCE_HIGH));
         wakeLock=getSystemService(PowerManager.class).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"liftlog:rest");
     }
