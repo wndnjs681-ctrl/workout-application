@@ -17,6 +17,7 @@ const server=http.createServer((req,res)=>{const file=path.join(root,new URL(req
  await page.fill('#exercise-search','스쿼트');assert.ok(await page.locator('.exercise-choice').count()>10);pass('다양한 스쿼트 검색');
  // Simulate the visual viewport exposed when a mobile keyboard overlays the layout viewport.
  await page.evaluate(()=>{window.testViewport=new EventTarget();testViewport.height=360;testViewport.offsetTop=0;Object.defineProperty(window,'visualViewport',{configurable:true,value:testViewport});syncViewport();});
+ await page.waitForTimeout(250);
  let layout=await page.evaluate(()=>({search:document.querySelector('#exercise-search').getBoundingClientRect().top,button:document.querySelector('#picker-add').getBoundingClientRect().bottom,results:document.querySelector('.picker-list').getBoundingClientRect().height}));
  assert.ok(layout.search>=0&&layout.button<=360&&layout.results>15,JSON.stringify(layout));pass('키보드 위 검색창·추가 버튼·목록 유지');
  await page.evaluate(()=>{testViewport.height=844;syncViewport()});

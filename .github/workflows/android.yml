@@ -74,3 +74,36 @@ jobs:
         with:
           name: Liftlog-1.3.0-Screen-Checks
           path: test-output/
+  android-device-checks:
+    needs: apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Liftlog-1.3.0-APK
+          path: dist
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install device test runtime
+        run: python3 -m pip install websocket-client --break-system-packages
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_4
+          disable-animations: true
+          script: python3 tests/android-device.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Liftlog-1.3.0-Android-Checks
+          path: test-output/
