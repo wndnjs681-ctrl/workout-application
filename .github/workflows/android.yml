@@ -74,7 +74,9 @@ jobs:
       - name: Check mobile interactions
         env:
           NODE_PATH: /tmp/liftlog-check/node_modules
-        run: node tests/upgrade-ui.cjs
+        run: |
+          node tests/upgrade-ui.cjs
+          node tests/polish-ui.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

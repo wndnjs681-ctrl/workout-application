@@ -17,6 +17,11 @@ public class MainActivity extends Activity {
     private WebView web;
     private static final int EXPORT=10, IMPORT=11;
     private String exportData;
+    private final BroadcastReceiver restSkipped=new BroadcastReceiver(){
+        @Override public void onReceive(Context context,Intent intent){
+            if(web!=null)web.evaluateJavascript("window.nativeRestStopped && window.nativeRestStopped()",null);
+        }
+    };
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         getWindow().setStatusBarColor(Color.rgb(255,247,250));
@@ -57,6 +62,8 @@ public class MainActivity extends Activity {
             } else view.setPadding(insets.getSystemWindowInsetLeft(),insets.getSystemWindowInsetTop(),insets.getSystemWindowInsetRight(),insets.getSystemWindowInsetBottom());
             return Build.VERSION.SDK_INT>=30 ? WindowInsets.CONSUMED : insets.consumeSystemWindowInsets();
         });
+        if(Build.VERSION.SDK_INT>=33)registerReceiver(restSkipped,new IntentFilter("kr.liftlog.app.REST_SKIPPED"),Context.RECEIVER_NOT_EXPORTED);
+        else registerReceiver(restSkipped,new IntentFilter("kr.liftlog.app.REST_SKIPPED"));
         root.requestApplyInsets();
         web.loadUrl("https://app.liftlog.local/");
     }
@@ -69,7 +76,7 @@ public class MainActivity extends Activity {
     @Override protected void onNewIntent(Intent intent) { super.onNewIntent(intent);setIntent(intent);handleLaunch(intent); }
     @Override protected void onResume(){super.onResume();if(web!=null)web.onResume();}
     @Override protected void onPause(){if(web!=null)web.onPause();super.onPause();}
-    @Override protected void onDestroy(){if(web!=null)web.destroy();super.onDestroy();}
+    @Override protected void onDestroy(){unregisterReceiver(restSkipped);if(web!=null)web.destroy();super.onDestroy();}
     @Override public void onBackPressed(){web.evaluateJavascript("window.handleBack && window.handleBack()",result->{if("false".equals(result))super.onBackPressed();});}
     private void message(String text){runOnUiThread(()->Toast.makeText(this,text,Toast.LENGTH_LONG).show());}
     public class Bridge {

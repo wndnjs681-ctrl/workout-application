@@ -1,0 +1,27 @@
+const {chromium}=require('playwright'),fs=require('fs'),path=require('path'),http=require('http'),assert=require('node:assert/strict');
+const root=path.resolve(__dirname,'../app/src/main/assets'),output=path.resolve(__dirname,'../test-output');fs.mkdirSync(output,{recursive:true});
+const server=http.createServer((req,res)=>{const name=new URL(req.url,'http://localhost').pathname;const file=path.join(root,name==='/'?'index.html':name);try{res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(file))}catch{res.statusCode=404;res.end()}});
+(async()=>{
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch();const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const click=a=>page.locator(`[data-action="${a}"]`).first().click(),state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('liftlog-v1'))),pass=m=>console.log('PASS '+m);
+ await page.goto(`http://127.0.0.1:${server.address().port}/`);await click('start');assert.equal((await state()).draft.clock.paused,true);pass('운동 선택 전 시간 누적 방지');
+ await page.fill('#exercise-search','바벨 벤치프레스');await click('favorite');await page.locator('[data-filter="즐겨찾기"]').click();assert.equal(await page.locator('.exercise-choice').count(),1);pass('즐겨찾기 빠른 선택');
+ await click('pickExercise');await click('addPicked');assert.equal((await state()).draft.clock.paused,false);pass('운동 선택 후 전체 시간 시작');
+ assert.match(await page.locator('#elapsed').innerText(),/^\d{2}:\d{2}:\d{2}$/);await click('toggleWorkoutClock');let before=await page.locator('#elapsed').innerText();await page.waitForTimeout(1100);assert.equal(await page.locator('#elapsed').innerText(),before);await click('toggleWorkoutClock');pass('전체 시간 일시정지 및 이어하기');
+ await click('clockEdit');await page.fill('#clock-minutes','62');await page.fill('#clock-seconds','3');await click('saveClock');assert.match(await page.locator('#elapsed').innerText(),/01:02:0[3-5]/);pass('전체 시간 직접 수정과 1시간 이상 표시');
+ await click('exerciseRest');await page.locator('[data-action="setRestPreset"][data-seconds="120"]').click();await click('checkSet');assert.equal((await state()).timer.total,120);pass('운동별 2분 자동 휴식');
+ const add=await page.locator('[data-action="timerAdd"]').elementHandle();await page.waitForTimeout(700);assert.equal(await add.evaluate(el=>el.isConnected),true);pass('카운트다운 중 조작 버튼 DOM 유지');
+ await click('timerSubtract');assert.ok((await state()).timer.remaining<=105);await click('timerToggle');const remaining=(await state()).timer.remaining;await click('timerAdd');assert.equal((await state()).timer.remaining,remaining+15);await click('timerStop');assert.equal((await state()).timer,null);pass('하단 휴식 감소·정지·증가·건너뛰기');
+ await click('timer');await page.locator('[data-action="timerPreset"][data-seconds="60"]').click();await page.waitForTimeout(550);assert.match(await page.locator('#sheet-timer').innerText(),/^0[01]:[0-5]\d$/);await click('close');await click('timerStop');pass('확장 타이머 프리셋');
+ await click('saveRoutine').catch(async()=>{await click('finish');await click('saveRoutine')});
+ await page.fill('#routine-name','나의 벤치 루틴');await click('confirmSaveRoutine');assert.equal((await state()).customRoutines[0].name,'나의 벤치 루틴');pass('운동 구성 루틴 저장');
+ await page.screenshot({path:path.join(output,'polish-workout.png'),fullPage:true});
+ await click('finish');await page.fill('#finish-minutes','65');await page.fill('#finish-seconds','20');await click('saveWorkout');let d=await state();assert.equal(d.sessions[0].duration,3920);assert.equal(d.draft,null);pass('수정한 전체 운동 시간 저장');
+ await click('viewSession');await click('sessionTime');await page.fill('#session-minutes','45');await page.fill('#session-seconds','0');await click('saveSessionTime');d=await state();assert.equal(d.sessions[0].duration,2700);assert.equal(d.sessions[0].originalDuration,3920);pass('과거 기록 시간 수정과 원래 시간 보존');
+ await page.locator('[data-page="routines"]').first().click();await click('customRoutine');assert.equal((await state()).draft.name,'나의 벤치 루틴');assert.equal((await state()).draft.exercises[0].sets[0].done,false);pass('내 루틴 바로 시작');
+ // Reproduce old 8000-minute draft from 1.1, including a completed set.
+ await page.evaluate(()=>{data.draft={id:'old',name:'8000분 오류 기록',date:dateKey(),startedAt:Date.now()-8000*60000,notes:'보존할 메모',exercises:[{id:'bench',sets:[{weightKg:40,reps:10,done:true}]}]};save()});await page.reload();
+ assert.equal(await page.locator('#elapsed').innerText(),'00:00:00');assert.equal(await page.locator('.time-review').count(),1);assert.equal((await state()).draft.exercises[0].sets[0].weightKg,40);pass('8000분 오류 재현·시간 보정 안내·세트 보존');
+ await click('finish');await click('saveWorkout');assert.equal((await state()).draft.id,'old');await page.fill('#finish-minutes','50');await click('saveWorkout');assert.equal((await state()).sessions.at(-1).duration,3000);pass('오래된 운동 실제 시간 확인 후 저장');
+ await page.setViewportSize({width:320,height:720});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=320));assert.deepEqual(errors,[]);pass('좁은 화면·브라우저 오류 검사');await browser.close();server.close();
+})().catch(e=>{console.error(e);server.close();process.exit(1)});

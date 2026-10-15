@@ -66,3 +66,23 @@ run('data.draft.exercises[0].sets=Array.from({length:99},()=>({weightKg:20,reps:
 run('addSets(0);addSets(0)');test('한 세트 추가 100세트 한도 보호',"data.draft.exercises[0].sets.length===100");
 run('deleteSet(0,0);const oldId=data.draft.id;data.draft.id="another-draft";undoDeletedSet()');test('다른 운동에 잘못 복원하지 않음',"data.draft.exercises[0].sets.length===99");
 test('확장 운동 포함 백업 검증',"(()=>{const x=fresh();x.draft={id:'test',date:dateKey(),name:'test',notes:'',startedAt:Date.now(),exercises:[newExercise('ex_001')]};return validate(x).draft.exercises[0].id==='ex_001';})()");
+// Elapsed time regression: a draft left for days must never become an 8000-minute workout.
+test('전체 시간 시분초 구분',"workoutClock(3661)==='01:01:01'&&workoutClock(61)==='00:01:01'");
+run("data=fresh();data.draft={id:'abandoned',date:dateKey(),name:'오래된 운동',notes:'메모',startedAt:Date.now()-8000*60000,exercises:[newExercise('bench')]};normalizeClock()");
+test('8000분 방치 기록 자동 확인',"data.draft.clock.paused&&data.draft.clock.needsReview&&workoutElapsedMs()===0");
+test('오래된 진행 세트와 메모 보존',"data.draft.exercises[0].sets.length===3&&data.draft.notes==='메모'");
+run('data.draft.clock={...newClock(100000),elapsedMs:60000};checkpointClock(130000)');
+test('운동 시간 정확히 누적',"data.draft.clock.elapsedMs===90000&&workoutElapsedMs(data.draft,140000)===100000");
+run('data.draft.clock.paused=true');test('일시정지 중 시간 불변',"workoutElapsedMs(data.draft,800000)===90000");
+run('data.draft.clock={...newClock(100000),elapsedMs:60000,lastSeenMs:130000};normalizeClock(data.draft,100000+WORKOUT_IDLE_MS+100000)');
+test('재실행 긴 공백 시간 제외',"data.draft.clock.paused&&data.draft.clock.needsReview&&data.draft.clock.elapsedMs===90000");
+test('과거 비정상 시간은 원본 보존하고 통계 제외',"(()=>{const s={duration:8000*3600};return reliableDuration(s)===0&&durationLabel(s)==='시간 확인 필요'&&s.duration===8000*3600})()");
+test('확인한 장시간 기록은 통계 반영',"reliableDuration({duration:13*3600,durationConfirmed:true})===13*3600");
+run("data=fresh();startWorkout(dateKey(),routines[0]);data.settings.exerciseRest={squat:120};actions.checkSet({dataset:{ex:'0',set:'0'},closest:()=>null})");
+test('종목별 휴식 자동 적용',"data.timer.total===120&&data.timer.exerciseId==='squat'");
+run('adjustTimer(-15)');test('휴식 15초 감소',"timerSeconds()<=105&&timerSeconds()>103");
+run('toggleTimer();adjustTimer(15)');test('정지 상태 시간 조절',"data.timer.paused&&data.timer.remaining>=118&&data.timer.remaining<=120");
+run('window.nativeRestStopped()');test('알림 건너뛰기 UI 동기화',"data.timer===null");
+run("data.settings.favorites=['squat','bench']");test('즐겨찾기 검색',"searchExercises('', '즐겨찾기').length===2&&searchExercises('스쿼트','즐겨찾기')[0].id==='squat'");
+run("data.customRoutines=[{id:'r1',name:'내 루틴',exercises:[newExercise('bench')]}]");test('사용자 루틴 백업 검증',"validate(JSON.parse(JSON.stringify(data))).customRoutines[0].exercises[0].id==='bench'");
+test('손상된 시계 백업 거부',"(()=>{const x=JSON.parse(JSON.stringify(data));x.draft.clock.elapsedMs=-1;try{validate(x);return false}catch(e){return true}})()");

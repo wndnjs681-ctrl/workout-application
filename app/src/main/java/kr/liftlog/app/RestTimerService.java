@@ -19,7 +19,15 @@ public class RestTimerService extends Service {
     }
     @Override public int onStartCommand(Intent intent,int flags,int id){
         if(intent==null){stopSelf();return START_NOT_STICKY;}
-        if("stop".equals(intent.getAction())){stopSelf();return START_NOT_STICKY;}
+        if("stop".equals(intent.getAction())){
+            try {
+                android.content.SharedPreferences prefs=getSharedPreferences("liftlog",MODE_PRIVATE);
+                org.json.JSONObject state=new org.json.JSONObject(prefs.getString("data","{}"));
+                state.put("timer",org.json.JSONObject.NULL);prefs.edit().putString("data",state.toString()).commit();
+            }catch(Exception ignored){}
+            sendBroadcast(new Intent("kr.liftlog.app.REST_SKIPPED").setPackage(getPackageName()));
+            stopSelf();return START_NOT_STICKY;
+        }
         int seconds=Math.max(1,Math.min(3600,intent.getIntExtra("seconds",90)));
         deadline=SystemClock.elapsedRealtime()+seconds*1000L;
         handler.removeCallbacksAndMessages(null);
