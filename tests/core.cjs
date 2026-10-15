@@ -86,3 +86,5 @@ run('window.nativeRestStopped()');test('알림 건너뛰기 UI 동기화',"data.
 run("data.settings.favorites=['squat','bench']");test('즐겨찾기 검색',"searchExercises('', '즐겨찾기').length===2&&searchExercises('스쿼트','즐겨찾기')[0].id==='squat'");
 run("data.customRoutines=[{id:'r1',name:'내 루틴',exercises:[newExercise('bench')]}]");test('사용자 루틴 백업 검증',"validate(JSON.parse(JSON.stringify(data))).customRoutines[0].exercises[0].id==='bench'");
 test('손상된 시계 백업 거부',"(()=>{const x=JSON.parse(JSON.stringify(data));x.draft.clock.elapsedMs=-1;try{validate(x);return false}catch(e){return true}})()");
+
+run("data=fresh();startWorkout(dateKey(),routines[0]);data.settings.exerciseRest={squat:150};toggleTimer()");test('하단 수동 시작도 다음 운동의 휴식 시간 적용',"data.timer.total===150&&data.timer.exerciseId==='squat'");
