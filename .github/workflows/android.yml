@@ -71,7 +71,7 @@ jobs:
           mkdir -p /tmp/liftlog-check
           npm install --prefix /tmp/liftlog-check playwright
           /tmp/liftlog-check/node_modules/.bin/playwright install --with-deps chromium
-      - name: Check mobile interactions
+      - name: Check mobile gestures and historical date editing
         env:
           NODE_PATH: /tmp/liftlog-check/node_modules
         run: |
