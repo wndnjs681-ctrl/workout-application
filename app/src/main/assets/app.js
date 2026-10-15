@@ -556,6 +556,7 @@ document.addEventListener('focusin',event=>{
  if(el.matches?.('input,textarea'))setTimeout(()=>el.scrollIntoView?.({block:'nearest',behavior:'smooth'}),250);
 });
 document.addEventListener('focusout',event=>{const el=event.target;if(el.dataset.field&&el.value.trim()===''){const set=data.draft?.exercises[Number(el.dataset.ex)]?.sets[Number(el.dataset.set)];if(set&&el.dataset.field==='reps'){el.value=set.reps||'';el.setCustomValidity('');}}});
+document.addEventListener('dragstart',event=>{if(event.target.closest?.('.set-row'))event.preventDefault();});
 document.addEventListener('pointerdown',event=>{
  const row=event.target.closest?.('.set-row');
  if(openSwipe&&(!row||row!==openSwipe)){openSwipe.style.transform='';openSwipe=null;}

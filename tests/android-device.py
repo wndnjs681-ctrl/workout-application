@@ -32,6 +32,9 @@ def js(expression):
    return result.get('result',{}).get('value')
 def shot(name):
  with (out/name).open('wb') as f:subprocess.run(['adb','exec-out','screencap','-p'],stdout=f,check=True)
+print('CDP target',target,flush=True)
+print('Initial page',js("JSON.stringify({url:location.href,text:document.body?.innerText,ready:document.readyState,actions:typeof actions})"),flush=True)
+shot('android-initial.png')
 wait(lambda:js("typeof actions==='object'"))
 assert js('library.length')==294
 js('actions.start()');time.sleep(1)
