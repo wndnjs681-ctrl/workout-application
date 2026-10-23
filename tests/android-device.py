@@ -28,8 +28,7 @@ adb('shell','am','start','-n','kr.liftlog.app.next/kr.liftlog.app.MainActivity')
 pid=wait(lambda:adb('shell','pidof','kr.liftlog.app.next'))
 wait(lambda:'webview_devtools_remote_'+pid in adb('shell','cat','/proc/net/unix'))
 adb('forward','tcp:9222','localabstract:webview_devtools_remote_'+pid)
-target=wait(lambda:json.load(urllib.request.urlopen('http://127.0.0.1:9222/json'))[0])
-ws=websocket.create_connection(target['webSocketDebuggerUrl'],suppress_origin=True,timeout=15);seq=0
+target=None;ws=None;seq=0
 def js(expression):
  global seq
  seq+=1;ws.send(json.dumps({'id':seq,'method':'Runtime.evaluate','params':{'expression':expression,'returnByValue':True}}))
@@ -41,6 +40,17 @@ def js(expression):
    return result.get('result',{}).get('value')
 def shot(name):
  with (out/name).open('wb') as f:subprocess.run(['adb','exec-out','screencap','-p'],stdout=f,check=True)
+def attach_loaded_page():
+ global target,ws,seq
+ targets=json.load(urllib.request.urlopen('http://127.0.0.1:9222/json'))
+ target=next((t for t in targets if 'app.liftlog.local' in t.get('url','') and t.get('title') and not json.loads(t.get('description') or '{}').get('empty',False)),None)
+ if not target:return False
+ if ws:
+  try:ws.close()
+  except Exception:pass
+ ws=websocket.create_connection(target['webSocketDebuggerUrl'],suppress_origin=True,timeout=15);seq=0
+ return js("typeof actions==='object'&&document.readyState==='complete'") is True
+wait(attach_loaded_page,seconds=60)
 print('CDP target',target,flush=True)
 print('Initial page',js("JSON.stringify({url:location.href,text:document.body?.innerText,ready:document.readyState,actions:typeof actions})"),flush=True)
 shot('android-initial.png')
@@ -107,9 +117,7 @@ try:ws.close()
 except Exception:pass
 pid=wait(lambda:adb('shell','pidof','kr.liftlog.app.next'))
 adb('forward','tcp:9222','localabstract:webview_devtools_remote_'+pid)
-target=wait(lambda:next((t for t in json.load(urllib.request.urlopen('http://127.0.0.1:9222/json')) if 'app.liftlog.local' in t.get('url','')),None))
-ws=websocket.create_connection(target['webSocketDebuggerUrl'],suppress_origin=True,timeout=15);seq=0
-wait(lambda:js("typeof actions==='object'"),seconds=30)
+wait(attach_loaded_page,seconds=30)
 
 adb('shell','cmd','statusbar','collapse');adb('shell','am','start','-a','android.settings.SETTINGS');time.sleep(3)
 # Confirm foreground timer survives leaving the activity.
