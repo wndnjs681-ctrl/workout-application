@@ -14,7 +14,7 @@ def wait(check,seconds=30):
    print("Waiting:",str(error)[:180],flush=True)
   time.sleep(.5)
  raise AssertionError('Timed out waiting for device state')
-adb('install','-r','dist/Liftlog-1.4.1.apk')
+adb('install','-r','dist/Liftlog-1.4.2.apk')
 adb('shell','pm','grant','kr.liftlog.app.next','android.permission.POST_NOTIFICATIONS')
 adb('shell','settings','put','secure','show_ime_with_hard_keyboard','1')
 print('Lock notification defaults:',adb('shell','settings','get','secure','lock_screen_show_notifications'),adb('shell','settings','get','secure','lock_screen_show_silent_notifications'),flush=True)

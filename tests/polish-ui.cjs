@@ -2,7 +2,7 @@ const {chromium}=require('playwright'),fs=require('fs'),path=require('path'),htt
 const root=path.resolve(__dirname,'../app/src/main/assets'),output=path.resolve(__dirname,'../test-output');fs.mkdirSync(output,{recursive:true});
 const server=http.createServer((req,res)=>{const name=new URL(req.url,'http://localhost').pathname;const file=path.join(root,name==='/'?'index.html':name);try{res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(file))}catch{res.statusCode=404;res.end()}});
 (async()=>{
- await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch();const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({executablePath:process.env.LIFTLOG_BROWSER_PATH||undefined});const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  const click=a=>page.locator(`[data-action="${a}"]`).first().click(),state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('liftlog-v1'))),pass=m=>console.log('PASS '+m);
  await page.goto(`http://127.0.0.1:${server.address().port}/`);await page.waitForTimeout(300);await page.screenshot({path:path.join(output,'lime-home.png'),fullPage:true});await click('start');assert.equal((await state()).draft.clock.paused,true);pass('운동 선택 전 시간 누적 방지');
  await page.fill('#exercise-search','바벨 벤치프레스');await click('favorite');await page.locator('[data-filter="즐겨찾기"]').click();assert.equal(await page.locator('.exercise-choice').count(),1);pass('즐겨찾기 빠른 선택');

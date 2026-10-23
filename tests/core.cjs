@@ -55,13 +55,13 @@ test('운동 ID 중복 없음',"new Set(library.map(e=>e.id)).size===library.len
 test('장비와 부위 복합 검색',"searchExercises('케이블 등').length>5&&searchExercises('케이블 등').every(e=>e.muscle==='등'&&e.equipment==='케이블')");
 test('띄어쓰기 없는 운동 검색',"searchExercises('힙어브덕션').length===2");
 test('다른 한글 표기 검색',"searchExercises('렛풀다운')[0].id==='latpull'");
-run("data=fresh();startWorkout(dateKey(),routines[0]);data.draft.exercises[0].sets[2]={weightKg:52.5,reps:8,done:true};addSets(0)");
+run("data=fresh();startWorkout(dateKey(),routines[0]);data.draft.exercises[0].sets=Array.from({length:3},()=>({...data.draft.exercises[0].sets[0]}));data.draft.exercises[0].sets[2]={weightKg:52.5,reps:8,done:true};addSets(0)");
 test('세트 추가 이전 값 복사 및 미완료',"data.draft.exercises[0].sets.length===4&&data.draft.exercises[0].sets[3].weightKg===52.5&&data.draft.exercises[0].sets[3].reps===8&&!data.draft.exercises[0].sets[3].done");
 run('addSets(0,3)');test('3세트 한 번에 추가',"data.draft.exercises[0].sets.length===7&&data.draft.exercises[0].sets.slice(-3).every(s=>s.weightKg===52.5&&!s.done)");
 run('deleteSet(0,2)');test('선택한 세트만 삭제',"data.draft.exercises[0].sets.length===6&&data.draft.exercises[0].sets[2].done===false");
 run('undoDeletedSet()');test('삭제 복원 위치 값 완료 상태 보존',"data.draft.exercises[0].sets.length===7&&data.draft.exercises[0].sets[2].weightKg===52.5&&data.draft.exercises[0].sets[2].done");
 run('undoDeletedSet()');test('복원 중복 방지',"data.draft.exercises[0].sets.length===7");
-run('data.draft.exercises[0].sets=[{weightKg:0,reps:10,done:false}];deleteSet(0,0)');test('마지막 한 세트 보호',"data.draft.exercises[0].sets.length===1");
+run('data.draft.exercises[0].sets=[{weightKg:0,reps:10,done:false}];deleteSet(0,0)');test('마지막 한 세트도 삭제 가능',"data.draft.exercises[0].sets.length===0");run('undoDeletedSet()');test('마지막 세트 삭제 되돌리기',"data.draft.exercises[0].sets.length===1&&data.draft.exercises[0].sets[0].reps===10");
 run('data.draft.exercises[0].sets=Array.from({length:99},()=>({weightKg:20,reps:10,done:false}));addSets(0,3)');test('빠른 추가 100세트 한도 보호',"data.draft.exercises[0].sets.length===99");
 run('addSets(0);addSets(0)');test('한 세트 추가 100세트 한도 보호',"data.draft.exercises[0].sets.length===100");
 run('deleteSet(0,0);const oldId=data.draft.id;data.draft.id="another-draft";undoDeletedSet()');test('다른 운동에 잘못 복원하지 않음',"data.draft.exercises[0].sets.length===99");
@@ -70,7 +70,7 @@ test('확장 운동 포함 백업 검증',"(()=>{const x=fresh();x.draft={id:'te
 test('전체 시간 시분초 구분',"workoutClock(3661)==='01:01:01'&&workoutClock(61)==='00:01:01'");
 run("data=fresh();data.draft={id:'abandoned',date:dateKey(),name:'오래된 운동',notes:'메모',startedAt:Date.now()-8000*60000,exercises:[newExercise('bench')]};normalizeClock()");
 test('8000분 방치 기록 2시간 자동 제한',"data.draft.clock.paused&&data.draft.clock.limitReached&&!data.draft.clock.needsReview&&workoutElapsedMs()===WORKOUT_MAX_MS");
-test('오래된 진행 세트와 메모 보존',"data.draft.exercises[0].sets.length===3&&data.draft.notes==='메모'");
+test('오래된 진행 세트와 메모 보존',"data.draft.exercises[0].sets.length===1&&data.draft.notes==='메모'");
 run('data.draft.clock={...newClock(100000),elapsedMs:60000};checkpointClock(130000)');
 test('운동 시간 정확히 누적',"data.draft.clock.elapsedMs===90000&&workoutElapsedMs(data.draft,140000)===100000");
 run('data.draft.clock.paused=true');test('일시정지 중 시간 불변',"workoutElapsedMs(data.draft,800000)===90000");
@@ -153,3 +153,9 @@ run("window.editedCustomId=data.draft.exercises[0].id;exerciseInfoSheet(0);apply
 test('직접 추가한 운동 정보 수정은 ID와 세트 유지',"data.draft.exercises[0].id===window.editedCustomId&&exercise(window.editedCustomId).name==='내 플랭크'&&data.draft.exercises[0].sets[0].reps===10");
 run("exerciseInfoSheet(0);loadError=true;applyExerciseInfo({...exerciseEditContext,values:{name:'실패할 수정',muscle:'기타',equipment:'',kind:'duration'}});loadError=false");
 test('운동 정보 저장 실패 시 새 ID와 단위 변경 취소',"data.draft.exercises[0].id===window.editedCustomId&&exercise(window.editedCustomId).name==='내 플랭크'&&data.customExercises.length===1");
+
+test('모든 운동은 기본 한 세트로 추가',"library.every(e=>newExercise(e.id).sets.length===1)");
+run("data=fresh();data.sessions=[{id:'previous-sets',date:dateKey(),name:'지난 세트',startedAt:1,finishedAt:2,duration:60,notes:'',exercises:[{id:'bench',sets:[{weightKg:52.5,reps:8,done:true},{weightKg:55,reps:6,done:true}]}]}]");
+test('지난 기록이 여러 세트여도 새 운동은 한 줄만 추가',"newExercise('bench').sets.length===1&&newExercise('bench').sets[0].weightKg===52.5&&!newExercise('bench').sets[0].done&&data.sessions[0].exercises[0].sets.length===2");
+run("startWorkout(dateKey(),{name:'시간 세트',ids:['plank']});deleteSet(0,0);addSets(0)");test('마지막 세트 삭제 후 추가하면 올바른 기록 단위 복원',"data.draft.exercises[0].sets.length===1&&data.draft.exercises[0].sets[0].reps===60");
+run("importHistory('previous-sets')");test('명시적으로 지난 운동 불러오기는 전체 세트 유지',"data.draft.exercises[0].sets.length===2&&data.draft.exercises[0].sets[1].weightKg===55");

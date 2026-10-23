@@ -2,7 +2,7 @@ const {chromium}=require('playwright'),fs=require('fs'),path=require('path'),htt
 const root=path.resolve(__dirname,'../app/src/main/assets'),out=path.resolve(__dirname,'../test-output');fs.mkdirSync(out,{recursive:true});
 const server=http.createServer((req,res)=>{const name=new URL(req.url,'http://localhost').pathname,file=path.join(root,name==='/'?'index.html':name);try{res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(file))}catch{res.statusCode=404;res.end()}});
 (async()=>{
- await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch(),page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({executablePath:process.env.LIFTLOG_BROWSER_PATH||undefined}),page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  const click=a=>page.locator(`[data-action="${a}"]`).first().click(),state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('liftlog-v1'))),pass=m=>console.log('PASS '+m);
  await page.goto(`http://127.0.0.1:${server.address().port}/`);await click('start');await page.fill('#exercise-search','bench');await page.locator('[data-action="pickExercise"][data-id="bench"]').click();await click('addPicked');
  await page.locator('[data-field="weight"]').first().fill('55');await page.locator('[data-field="reps"]').first().fill('7');await page.locator('#exercise-note-0').fill('내 메모 유지');await click('checkSet');await click('timerStop');

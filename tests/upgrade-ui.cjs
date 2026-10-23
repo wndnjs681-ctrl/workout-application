@@ -5,53 +5,24 @@ const output=path.resolve(__dirname,'../test-output');fs.mkdirSync(output,{recur
 const server=http.createServer((req,res)=>{const file=path.join(root,new URL(req.url,'http://localhost').pathname==='/'?'index.html':new URL(req.url,'http://localhost').pathname);try{res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(file))}catch{res.statusCode=404;res.end()}});
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
- const browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});
+ const browser=await chromium.launch({headless:true,executablePath:process.env.LIFTLOG_BROWSER_PATH||undefined});const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
- const click=action=>page.locator(`[data-action="${action}"]`).first().click();
- const state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('liftlog-v1')));
- const pass=message=>console.log('PASS '+message);
- await page.goto(`http://127.0.0.1:${server.address().port}/`);
- await click('start');assert.equal(await page.locator('.exercise-choice').count(),294);pass('294개 운동 표시');
- await page.fill('#exercise-search','힙 어브덕션');assert.equal(await page.locator('.exercise-choice').count(),2);pass('공백 포함 복합 검색');
- await page.fill('#exercise-search','렛풀다운');assert.equal(await page.locator('.exercise-choice').count(),1);pass('다른 표기 검색');
- await page.fill('#exercise-search','스쿼트');assert.ok(await page.locator('.exercise-choice').count()>10);pass('다양한 스쿼트 검색');
- // Simulate the visual viewport exposed when a mobile keyboard overlays the layout viewport.
- await page.evaluate(()=>{window.testViewport=new EventTarget();testViewport.height=360;testViewport.offsetTop=0;Object.defineProperty(window,'visualViewport',{configurable:true,value:testViewport});syncViewport();});
- await page.waitForTimeout(250);
- let layout=await page.evaluate(()=>({search:document.querySelector('#exercise-search').getBoundingClientRect().top,button:document.querySelector('#picker-add').getBoundingClientRect().bottom,results:document.querySelector('.picker-list').getBoundingClientRect().height}));
- assert.ok(layout.search>=0&&layout.button<=360&&layout.results>15,JSON.stringify(layout));pass('키보드 위 검색창·추가 버튼·목록 유지');
- await page.evaluate(()=>{testViewport.height=844;syncViewport()});
- await page.fill('#exercise-search','바벨 벤치프레스');await click('pickExercise');await click('addPicked');
- const weight=page.locator('[data-field="weight"]').first();const reps=page.locator('[data-field="reps"]').first();
- await weight.click();await page.keyboard.type('52.5');assert.equal(await weight.inputValue(),'52.5');
- await reps.click();await page.keyboard.type('8');assert.equal(await reps.inputValue(),'8');pass('기존 숫자를 지우지 않고 덮어쓰기');
- await click('addSet');assert.equal((await state()).draft.exercises[0].sets.length,4);assert.equal((await state()).draft.exercises[0].sets[3].weightKg,40);pass('한 번 눌러 이전 세트 복사 추가');
- await click('addThreeSets');assert.equal((await state()).draft.exercises[0].sets.length,7);pass('3세트 빠른 추가');
- await page.evaluate(()=>document.activeElement.blur());await weight.evaluate(el=>el.scrollIntoView({block:'center'}));await page.waitForTimeout(250);
- await page.evaluate(()=>{window.pointerLog=[];for(const t of ['pointerdown','pointermove','pointerup','pointercancel','dragstart'])document.addEventListener(t,e=>pointerLog.push({type:t,target:e.target.tagName,x:e.clientX,y:e.clientY,primary:e.isPrimary,gesture:!!swipeGesture}),true)});
- const box=await weight.boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();await page.mouse.move(box.x+box.width/2-90,box.y+box.height/2,{steps:12});await page.mouse.up();
- console.log('pointer trace',await page.evaluate(()=>JSON.stringify(pointerLog)));await page.screenshot({path:path.join(output,'upgrade-swipe.png')});
- assert.match(await page.locator('.set-row').first().getAttribute('style'),/translateX\(-96px\)/);pass('가로 밀기 삭제 버튼 표시');
- // A pointer press on the exposed delete button must not close the row first.
- await page.locator('[data-action="deleteSet"]').first().hover();await page.mouse.down();
- assert.match(await page.locator('.set-row').first().getAttribute('style'),/translateX\(-96px\)/);await page.mouse.up();assert.equal((await state()).draft.exercises[0].sets.length,6);
- await click('undoSet');assert.equal((await state()).draft.exercises[0].sets.length,7);assert.equal((await state()).draft.exercises[0].sets[0].weightKg,52.5);pass('임의 세트 삭제·무게 보존 복원');
- // Exercise real touch events through Chromium, including reverse swipe and cancellation.
- const cdp=await page.context().newCDPSession(page);
- const touch=async(type,x,y)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'||type==='touchCancel'?[]:[{x,y}]});
- const drag=async(dx,dy=0,cancel=false)=>{await page.locator('.set-number').first().evaluate(el=>el.scrollIntoView({block:'center'}));await page.waitForTimeout(200);const b=await page.locator('.set-number').first().boundingBox(),x=b.x+b.width/2,y=b.y+b.height/2;await touch('touchStart',x,y);for(let i=1;i<=8;i++)await touch('touchMove',x+dx*i/8,y+dy*i/8);await touch(cancel?'touchCancel':'touchEnd',x+dx,y+dy);await page.waitForTimeout(220)};
- // Start from the weight field so there is room to move left inside the viewport.
- const touchLeft=async()=>{await page.locator('[data-field="weight"]').first().evaluate(el=>el.scrollIntoView({block:'center'}));await page.waitForTimeout(200);const b=await page.locator('[data-field="weight"]').first().boundingBox(),x=b.x+b.width*.8,y=b.y+b.height/2;await touch('touchStart',x,y);for(let i=1;i<=10;i++)await touch('touchMove',x-i*9,y);await touch('touchEnd',x-90,y);await page.waitForTimeout(220)};
- await touchLeft();assert.equal(await page.locator('.swipe-open').count(),1);assert.equal(await page.locator('[data-field="weight"]').first().evaluate(el=>document.activeElement===el),false);pass('터치 밀기 후 키보드 오작동 방지');
- // Reverse from the visible, shifted row rather than its clipped number column.
- let rb=await page.locator('.set-row').first().boundingBox();let rx=rb.x+rb.width*.65,ry=rb.y+rb.height/2;
- await touch('touchStart',rx,ry);for(let i=1;i<=8;i++)await touch('touchMove',rx+i*10,ry);await touch('touchEnd',rx+80,ry);await page.waitForTimeout(220);assert.equal(await page.locator('.swipe-open').count(),0);pass('오른쪽으로 밀어 삭제 닫기');
- await drag(0,-55);assert.equal(await page.locator('.swipe-open').count(),0);pass('세로 스크롤은 삭제로 인식하지 않음');
- await touchLeft();await page.locator('[data-action="deleteSet"]').first().tap();assert.equal((await state()).draft.exercises[0].sets.length,6);await click('undoSet');pass('실제 터치로 삭제 버튼 탭과 복원');
- await page.locator('[data-field="weight"]').first().fill('');await click('checkSet');assert.equal((await state()).draft.exercises[0].sets[0].weightKg,0);assert.equal((await state()).draft.exercises[0].sets[0].done,true);pass('0 무게는 빈칸 그대로 완료 가능');
- await click('timerStop');await page.screenshot({path:path.join(output,'upgrade-workout.png'),fullPage:true});
- await page.reload();assert.equal((await state()).draft.exercises[0].sets.length,7);pass('업데이트 세트 재실행 복구');
- await page.setViewportSize({width:320,height:720});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=320));pass('320px 화면 가로 넘침 없음');
- await click('pick');await page.waitForTimeout(300);await page.screenshot({path:path.join(output,'upgrade-picker.png')});
- assert.deepEqual(errors,[]);pass('브라우저 오류 없음');await browser.close();server.close();
+ const click=action=>page.locator(`[data-action="${action}"]`).first().click(),state=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('liftlog-v1'))),count=async()=>(await state()).draft.exercises[0].sets.length,pass=m=>console.log('PASS '+m);
+ await page.goto(`http://127.0.0.1:${server.address().port}/`);await click('start');assert.equal(await page.locator('.exercise-choice').count(),294);pass('294개 운동 표시');
+ await page.fill('#exercise-search','힙 어브덕션');assert.equal(await page.locator('.exercise-choice').count(),2);await page.fill('#exercise-search','렛풀다운');assert.equal(await page.locator('.exercise-choice').count(),1);await page.fill('#exercise-search','스쿼트');assert.ok(await page.locator('.exercise-choice').count()>10);pass('운동 검색과 다른 한글 표기');
+ await page.evaluate(()=>{window.testViewport=new EventTarget();testViewport.height=360;testViewport.offsetTop=0;Object.defineProperty(window,'visualViewport',{configurable:true,value:testViewport});syncViewport();});await page.waitForTimeout(250);
+ const layout=await page.evaluate(()=>({search:document.querySelector('#exercise-search').getBoundingClientRect().top,button:document.querySelector('#picker-add').getBoundingClientRect().bottom,results:document.querySelector('.picker-list').getBoundingClientRect().height}));assert.ok(layout.search>=0&&layout.button<=360&&layout.results>15,JSON.stringify(layout));pass('키보드 위 검색창·추가 버튼·목록 유지');await page.evaluate(()=>{testViewport.height=844;syncViewport()});
+ await page.fill('#exercise-search','바벨 벤치프레스');await click('pickExercise');await click('addPicked');assert.equal(await count(),1);assert.equal(await page.locator('.set-row').count(),1);pass('운동 추가 시 기본 한 줄만 표시');
+ const weight=page.locator('[data-field="weight"]').first(),reps=page.locator('[data-field="reps"]').first();await weight.click();await page.keyboard.type('52.5');assert.equal(await weight.inputValue(),'52.5');await reps.click();await page.keyboard.type('8');assert.equal(await reps.inputValue(),'8');pass('기존 숫자를 지우지 않고 덮어쓰기');
+ await click('addSet');assert.equal(await count(),2);assert.equal((await state()).draft.exercises[0].sets[1].weightKg,52.5);await click('addThreeSets');assert.equal(await count(),5);pass('한 세트와 3세트 추가는 이전 값 복사');
+ await page.evaluate(()=>document.activeElement.blur());await weight.evaluate(el=>el.scrollIntoView({block:'center'}));await page.waitForTimeout(250);const box=await weight.boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();await page.mouse.move(box.x+box.width/2-90,box.y+box.height/2,{steps:12});await page.mouse.up();assert.equal(await count(),4);assert.equal(await page.locator('.swipe-open').count(),0);pass('밀고 놓으면 버튼 탭 없이 즉시 삭제');
+ await click('undoSet');assert.equal(await count(),5);assert.equal((await state()).draft.exercises[0].sets[0].weightKg,52.5);pass('스와이프 삭제 후 원래 위치·값으로 복원');
+ const cdp=await page.context().newCDPSession(page),touch=async(type,x,y)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'||type==='touchCancel'?[]:[{x,y}]});
+ const drag=async(dx,dy=0,cancel=false)=>{await weight.evaluate(el=>el.scrollIntoView({block:'center'}));await page.waitForTimeout(200);const b=await weight.boundingBox(),x=b.x+b.width*.8,y=b.y+b.height/2;await touch('touchStart',x,y);for(let i=1;i<=10;i++)await touch('touchMove',x+dx*i/10,y+dy*i/10);await touch(cancel?'touchCancel':'touchEnd',x+dx,y+dy);await page.waitForTimeout(220)};
+ await drag(-90);assert.equal(await count(),4);assert.equal(await weight.evaluate(el=>document.activeElement===el),false);await click('undoSet');assert.equal(await count(),5);pass('실제 터치 스와이프 삭제와 키보드 오작동 방지');
+ await drag(-20);assert.equal(await count(),5);assert.equal(await page.locator('.set-row').first().evaluate(el=>el.style.transform),'');await drag(70);assert.equal(await count(),5);await drag(0,-55);assert.equal(await count(),5);await drag(-90,0,true);assert.equal(await count(),5);pass('짧은 이동·오른쪽 이동·세로 스크롤·취소는 삭제하지 않음');
+ await weight.fill('');await click('checkSet');assert.equal((await state()).draft.exercises[0].sets[0].weightKg,0);assert.equal((await state()).draft.exercises[0].sets[0].done,true);await click('timerStop');pass('0 무게는 빈칸 그대로 완료 가능');
+ await page.evaluate(()=>{data.draft.exercises[0].sets=[data.draft.exercises[0].sets[0]];save();render()});await drag(-90);assert.equal(await count(),0);assert.equal(await page.locator('.exercise-card').count(),1);assert.equal(await page.locator('.set-row').count(),0);await click('undoSet');assert.equal(await count(),1);assert.equal((await state()).draft.exercises[0].sets[0].done,true);pass('마지막 한 줄도 삭제하고 완료 상태까지 되돌리기');
+ await drag(-90);await click('addSet');assert.equal(await count(),1);assert.equal((await state()).draft.exercises[0].sets[0].done,false);pass('빈 운동 카드에서 한 세트 다시 추가');
+ await page.reload();assert.equal(await count(),1);pass('한 줄 설정과 세트 변경 재실행 복구');await page.screenshot({path:path.join(output,'upgrade-workout.png'),fullPage:true});await page.setViewportSize({width:320,height:720});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=320));await click('pick');await page.waitForTimeout(300);await page.screenshot({path:path.join(output,'upgrade-picker.png')});assert.deepEqual(errors,[]);pass('320px 화면과 브라우저 오류 검사');await browser.close();server.close();
 })().catch(e=>{console.error(e);server.close();process.exit(1)});
