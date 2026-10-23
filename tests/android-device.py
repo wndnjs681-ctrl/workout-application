@@ -69,7 +69,22 @@ time.sleep(1)  # Wait for the WebView compositor and IME animation to finish.
 size=js("JSON.stringify({h:innerHeight,button:document.querySelector('#picker-add').getBoundingClientRect().bottom,search:document.querySelector('#exercise-search').getBoundingClientRect().top,list:document.querySelector('.picker-list').clientHeight})")
 size=json.loads(size);assert size['button']<=size['h']+1 and size['search']>=0 and size['list']>10,size
 shot('android-keyboard-search.png');print('PASS actual Android keyboard keeps search and add button visible',size)
-adb('shell','input','keyevent','4');js("closeSheet();data.draft.exercises=[newExercise('bench')];page='workout';save();render();startTimer(90)")
+adb('shell','input','keyevent','4');js("closeSheet();data.draft.exercises=[newExercise('bench')];data.draft.exercises[0].notes='실제 스와이프 메모';page='workout';save();render();document.querySelector('[data-field=weight]').scrollIntoView({block:'center'})")
+assert js('data.draft.exercises[0].sets.length')==1
+time.sleep(1)
+adb('shell','uiautomator','dump','/sdcard/liftlog-swipe.xml')
+xml=ET.fromstring(adb('shell','cat','/sdcard/liftlog-swipe.xml'))
+webview=next(n for n in xml.iter('node') if n.attrib.get('class')=='android.webkit.WebView')
+wx1,wy1,wx2,wy2=map(int,re.findall(r'\d+',webview.attrib['bounds']))
+point=json.loads(js("JSON.stringify((()=>{const r=document.querySelector('[data-field=weight]').getBoundingClientRect();return {x:r.x+r.width*.8,y:r.y+r.height/2,dpr:devicePixelRatio}})())"))
+sx=int(wx1+point['x']*point['dpr']);sy=int(wy1+point['y']*point['dpr']);ex=int(sx-90*point['dpr'])
+adb('shell','input','swipe',str(sx),str(sy),str(ex),str(sy),'250')
+wait(lambda:js('data.draft.exercises[0].sets.length===0'))
+assert js("data.draft.exercises[0].notes==='실제 스와이프 메모'")
+shot('android-direct-swipe-deleted.png');print('PASS real Android swipe deletes the only set without an extra tap and preserves notes',flush=True)
+js('actions.undoSet()');assert js('data.draft.exercises[0].sets.length')==1
+print('PASS native swipe undo restores the single set',flush=True)
+js('startTimer(90)')
 wait(lambda:'rest_countdown' in adb('shell','dumpsys','notification','--noredact'))
 notifications=adb('shell','dumpsys','notification','--noredact')
 assert 'kr.liftlog.app.next' in notifications and 'rest_countdown' in notifications
