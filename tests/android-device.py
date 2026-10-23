@@ -21,7 +21,7 @@ print('Lock notification defaults:',adb('shell','settings','get','secure','lock_
 adb('shell','settings','put','secure','lock_screen_show_notifications','1')
 adb('shell','settings','put','secure','lock_screen_show_silent_notifications','1')
 adb('shell','wm','size','720x1520')
-adb('shell','wm','density','320')
+adb('shell','wm','density','320');time.sleep(2)
 adb('shell','am','start','-a','android.settings.SETTINGS')
 adb('shell','am','force-stop','com.android.launcher3')
 adb('shell','am','start','-n','kr.liftlog.app.next/kr.liftlog.app.MainActivity')
@@ -60,6 +60,12 @@ js('actions.start()');time.sleep(1)
 # Tap the real accessibility node, so Android opens its actual input method.
 shot('android-picker-before-keyboard.png')
 def find_input():
+ # Display-density setup can recreate the Activity and restore the draft while
+ # dismissing its transient picker. Reopen that picker before testing its input.
+ try:
+  js("if(!document.querySelector('#exercise-search')){if(!data.draft)startWorkout();else openPicker();}")
+ except websocket.WebSocketConnectionClosedException:
+  attach_loaded_page();return None
  result=adb('shell','uiautomator','dump','/sdcard/liftlog-ui.xml')
  print('Accessibility dump:',result,flush=True)
  if 'dumped' not in result:return None
