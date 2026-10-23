@@ -639,7 +639,7 @@ const actions={
 };
 document.addEventListener('click',event=>{const b=event.target.closest('[data-action]');if(b&&!b.disabled){try{actions[b.dataset.action]?.(b);}catch(e){console.error(e);toast('작업을 완료하지 못했습니다. 다시 시도해 주세요.');}}else if(event.target.classList.contains('overlay-backdrop'))closeSheet();});
 document.addEventListener('input',event=>{
- const el=event.target;
+ const el=event.target;if(selectOnClickInput===el)selectOnClickInput=null;
  if(el.matches?.('textarea[data-exercise-note]')){
   const record=el.dataset.noteSession?data.sessions.find(s=>s.id===el.dataset.noteSession):data.draft;
   const entry=record?.exercises[Number(el.dataset.exerciseNote)];if(!entry)return;
@@ -674,7 +674,7 @@ render();
 if(loadError){page='settings';render();toast('저장 데이터를 읽지 못했습니다. 설정에서 확인해 주세요.');}
 
 
-let deletedSet=null,swipeGesture=null,openSwipe=null,suppressSwipeClickUntil=0,suppressedSwipeRow=null;
+let deletedSet=null,swipeGesture=null,openSwipe=null,suppressSwipeClickUntil=0,suppressedSwipeRow=null,selectOnClickInput=null;
 function addSets(index,count=1){
  const e=data.draft?.exercises[index];if(!e)return;
  if(e.sets.length+count>100){toast('운동당 최대 100세트까지 기록할 수 있어요.');return;}
@@ -704,10 +704,10 @@ function undoDeletedSet(){
 }
 document.addEventListener('focusin',event=>{
  const el=event.target;
- if(el.matches?.('input[data-field],input[type=number]')){el.select();setTimeout(()=>el.select(),0);}
+ if(el.matches?.('input[data-field],input[type=number]')){el.select();selectOnClickInput=el;}
  if(el.matches?.('input,textarea'))setTimeout(()=>el.scrollIntoView?.({block:'nearest',behavior:'smooth'}),250);
 });
-document.addEventListener('focusout',event=>{const el=event.target;if(el.dataset.field&&el.value.trim()===''){const set=data.draft?.exercises[Number(el.dataset.ex)]?.sets[Number(el.dataset.set)];if(set&&el.dataset.field==='reps'){el.value=set.reps||'';el.setCustomValidity('');}}});
+document.addEventListener('focusout',event=>{const el=event.target;if(selectOnClickInput===el)selectOnClickInput=null;if(el.dataset.field&&el.value.trim()===''){const set=data.draft?.exercises[Number(el.dataset.ex)]?.sets[Number(el.dataset.set)];if(set&&el.dataset.field==='reps'){el.value=set.reps||'';el.setCustomValidity('');}}});
 document.addEventListener('dragstart',event=>{if(event.target.closest?.('.set-row'))event.preventDefault();});
 function settleSwipe(row,opened){
  row.classList.remove('swiping');row.style.transform=opened?'translateX(-96px)':'';
@@ -751,7 +751,8 @@ function endSwipe(event){
 document.addEventListener('pointerup',endSwipe);
 document.addEventListener('pointercancel',()=>{const g=swipeGesture;swipeGesture=null;if(g)settleSwipe(g.row,g.offset<0);});
 document.addEventListener('click',event=>{
- if(Date.now()<suppressSwipeClickUntil&&event.target.closest?.('.set-row')){event.preventDefault();event.stopImmediatePropagation();}
+ if(Date.now()<suppressSwipeClickUntil&&event.target.closest?.('.set-row')){event.preventDefault();event.stopImmediatePropagation();return;}
+ if(event.target===selectOnClickInput){selectOnClickInput.select();selectOnClickInput=null;}
 },true);
 function syncViewport(){const v=window.visualViewport;if(!v)return;document.documentElement.style.setProperty('--vv-height',v.height+'px');document.documentElement.style.setProperty('--vv-top',v.offsetTop+'px');document.documentElement.classList.toggle('keyboard-open',window.innerHeight-v.height>100);}
 window.visualViewport?.addEventListener('resize',syncViewport);window.visualViewport?.addEventListener('scroll',syncViewport);window.addEventListener?.('resize',syncViewport);syncViewport();
