@@ -131,3 +131,25 @@ run("document.querySelector('#clock-minutes').value='120';document.querySelector
 test('2시간 1초 입력 거부',"Number.isNaN(readDuration('#clock-minutes','#clock-seconds',WORKOUT_MAX_MS/1000))");
 run("document.querySelector('#clock-seconds').value='0'");
 test('정확히 120분 입력 허용',"readDuration('#clock-minutes','#clock-seconds',WORKOUT_MAX_MS/1000)===7200");
+
+
+// Editing metadata must preserve quantities; a new recording unit gets a new identity.
+run("data=fresh();startWorkout(dateKey(),{name:'수정 테스트',ids:['bench','squat']});data.draft.exercises[0].sets[0]={weightKg:52.5,reps:8,done:true};data.draft.exercises[0].notes='남겨둘 메모';data.sessions=[{id:'past-kind',date:'2026-09-01',name:'지난 운동',startedAt:1000,finishedAt:2000,duration:600,notes:'',exercises:[{id:'bench',sets:[{weightKg:40,reps:10,done:true}]}]}];openPicker(0);requestExerciseReplacement('ohp')");
+test('동일 기록 방식 종목 변경 시 세트 값과 완료 메모 유지',"data.draft.exercises[0].id==='ohp'&&data.draft.exercises[0].sets[0].weightKg===52.5&&data.draft.exercises[0].sets[0].reps===8&&data.draft.exercises[0].sets[0].done&&data.draft.exercises[0].notes==='남겨둘 메모'");
+test('운동 종목 변경은 과거 기록을 바꾸지 않음',"data.sessions[0].exercises[0].id==='bench'&&data.sessions[0].exercises[0].sets[0].weightKg===40");
+run("openPicker(0);requestExerciseReplacement('plank')");
+test('다른 단위로 바꾸기 전 확인',"modal==='confirm'&&data.draft.exercises[0].id==='ohp'");
+run("replaceWorkoutExercise('plank',true)");test('시간 종목 변경은 초 단위 기본 세트로 시작',"data.draft.exercises[0].id==='plank'&&data.draft.exercises[0].sets[0].reps===60&&!data.draft.exercises[0].sets[0].done&&data.draft.exercises[0].notes==='남겨둘 메모'");
+run("openPicker(0)");test('이미 있는 운동으로 중복 변경 거부',"replaceWorkoutExercise('squat',true)===false&&data.draft.exercises[0].id==='plank'");
+run("openPicker(0);loadError=true;replaceWorkoutExercise('run',true);loadError=false");test('종목 교체 저장 실패 시 원래 세트 보존',"data.draft.exercises[0].id==='plank'&&data.draft.exercises[0].sets[0].reps===60");
+run("exerciseInfoSheet(1);applyExerciseInfo({...exerciseEditContext,values:{name:'내 스쿼트',muscle:'하체',equipment:'파워랙',kind:'strength'}})");
+test('기본 운동 이름 부위 기구 수정',"exercise('squat').name==='내 스쿼트'&&exercise('squat').equipment==='파워랙'&&data.draft.exercises[1].id==='squat'");
+test('수정한 이름 검색',"searchExercises('내 스쿼트')[0].id==='squat'");
+test('운동 수정 정보 백업 검증',"validate(JSON.parse(JSON.stringify(data))).settings.exerciseOverrides.squat.name==='내 스쿼트'");
+test('수정 정보로 기본 운동의 단위를 몰래 바꾸는 백업 거부',"(()=>{const x=JSON.parse(JSON.stringify(data));x.settings.exerciseOverrides.squat.kind='duration';try{validate(x);return false}catch(e){return true}})()");
+run("exerciseInfoSheet(0);applyExerciseInfo({...exerciseEditContext,values:{name:'플랭크 반복',muscle:'코어',equipment:'매트',kind:'bodyweight'}})");
+test('기록 방식 변경은 새 운동 ID로 분리',"data.draft.exercises[0].id.startsWith('custom_')&&exercise(data.draft.exercises[0].id).kind==='bodyweight'&&exercise('plank').kind==='duration'&&data.draft.exercises[0].notes==='남겨둘 메모'");
+run("window.editedCustomId=data.draft.exercises[0].id;exerciseInfoSheet(0);applyExerciseInfo({...exerciseEditContext,values:{name:'내 플랭크',muscle:'기타',equipment:'맨몸',kind:'bodyweight'}})");
+test('직접 추가한 운동 정보 수정은 ID와 세트 유지',"data.draft.exercises[0].id===window.editedCustomId&&exercise(window.editedCustomId).name==='내 플랭크'&&data.draft.exercises[0].sets[0].reps===10");
+run("exerciseInfoSheet(0);loadError=true;applyExerciseInfo({...exerciseEditContext,values:{name:'실패할 수정',muscle:'기타',equipment:'',kind:'duration'}});loadError=false");
+test('운동 정보 저장 실패 시 새 ID와 단위 변경 취소',"data.draft.exercises[0].id===window.editedCustomId&&exercise(window.editedCustomId).name==='내 플랭크'&&data.customExercises.length===1");

@@ -49,6 +49,10 @@ public class RestTimerService extends Service {
     }
     private RemoteViews countdownView(int layout){
         RemoteViews view=new RemoteViews(getPackageName(),layout);
+        // OEM notification themes must not recolor app-themed text against a dark panel.
+        view.setTextColor(R.id.rest_title,android.graphics.Color.rgb(242,248,236));
+        view.setTextColor(R.id.rest_subtitle,android.graphics.Color.rgb(189,208,180));
+        view.setTextColor(R.id.rest_clock,android.graphics.Color.rgb(200,250,113));
         view.setChronometer(R.id.rest_clock,deadline,null,true);
         view.setChronometerCountDown(R.id.rest_clock,true);
         return view;
@@ -65,4 +69,5 @@ public class RestTimerService extends Service {
     @Override public void onDestroy(){handler.removeCallbacksAndMessages(null);if(wakeLock!=null && wakeLock.isHeld())wakeLock.release();stopForeground(STOP_FOREGROUND_REMOVE);super.onDestroy();}
     @Override public IBinder onBind(Intent i){return null;}
 }
+
 

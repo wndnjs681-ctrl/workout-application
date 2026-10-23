@@ -14,7 +14,7 @@ def wait(check,seconds=30):
    print("Waiting:",str(error)[:180],flush=True)
   time.sleep(.5)
  raise AssertionError('Timed out waiting for device state')
-adb('install','-r','dist/Liftlog-1.4.0.apk')
+adb('install','-r','dist/Liftlog-1.4.1.apk')
 adb('shell','pm','grant','kr.liftlog.app.next','android.permission.POST_NOTIFICATIONS')
 adb('shell','settings','put','secure','show_ime_with_hard_keyboard','1')
 print('Lock notification defaults:',adb('shell','settings','get','secure','lock_screen_show_notifications'),adb('shell','settings','get','secure','lock_screen_show_silent_notifications'),flush=True)
@@ -75,6 +75,27 @@ notifications=adb('shell','dumpsys','notification','--noredact')
 assert 'kr.liftlog.app.next' in notifications and 'rest_countdown' in notifications
 assert js('Android.load().includes("timer")')
 adb('shell','cmd','statusbar','expand-notifications');time.sleep(2);shot('android-countdown-notification.png')
+# Fixed panel and explicit text colors must remain visible in both system themes.
+from PIL import Image
+for night,name in [('yes','dark'),('no','light')]:
+ adb('shell','cmd','statusbar','collapse');adb('shell','cmd','uimode','night',night);time.sleep(2)
+ adb('shell','cmd','statusbar','expand-notifications');time.sleep(2)
+ filename='android-notification-'+name+'.png';shot(filename)
+ im=Image.open(out/filename).convert('RGB')
+ panel=sum(1 for r,g,b in im.getdata() if abs(r-17)<3 and abs(g-27)<3 and abs(b-20)<3)
+ right=im.crop((int(im.width*.35),0,im.width,im.height))
+ lime=sum(1 for r,g,b in right.getdata() if 194<=r<=206 and 244<=g<=255 and 107<=b<=120)
+ assert panel>2000 and lime>40,{'theme':name,'dark_panel_pixels':panel,'bright_timer_pixels':lime}
+ print('PASS notification contrast in '+name+' mode',{'dark_panel_pixels':panel,'bright_timer_pixels':lime},flush=True)
+# A night-mode configuration change may recreate the WebView; attach to its current target.
+try:ws.close()
+except Exception:pass
+pid=wait(lambda:adb('shell','pidof','kr.liftlog.app.next'))
+adb('forward','tcp:9222','localabstract:webview_devtools_remote_'+pid)
+target=wait(lambda:next((t for t in json.load(urllib.request.urlopen('http://127.0.0.1:9222/json')) if 'app.liftlog.local' in t.get('url','')),None))
+ws=websocket.create_connection(target['webSocketDebuggerUrl'],suppress_origin=True,timeout=15);seq=0
+wait(lambda:js("typeof actions==='object'"),seconds=30)
+
 adb('shell','cmd','statusbar','collapse');adb('shell','am','start','-a','android.settings.SETTINGS');time.sleep(3)
 # Confirm foreground timer survives leaving the activity.
 assert 'RestTimerService' in adb('shell','dumpsys','activity','services','kr.liftlog.app.next')
