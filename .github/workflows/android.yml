@@ -51,11 +51,11 @@ jobs:
       - name: Prepare download
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/debug/app-debug.apk dist/Liftlog-1.3.2.apk
+          cp app/build/outputs/apk/debug/app-debug.apk dist/Liftlog-1.4.0.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: Liftlog-1.3.2-APK
-          path: dist/Liftlog-1.3.2.apk
+          name: Liftlog-1.4.0-APK
+          path: dist/Liftlog-1.4.0.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -71,16 +71,17 @@ jobs:
           mkdir -p /tmp/liftlog-check
           npm install --prefix /tmp/liftlog-check playwright
           /tmp/liftlog-check/node_modules/.bin/playwright install --with-deps chromium
-      - name: Check mobile gestures and historical date editing
+      - name: Check exercise notes, two-hour cap and mobile interactions
         env:
           NODE_PATH: /tmp/liftlog-check/node_modules
         run: |
+          node tests/core.cjs
           node tests/upgrade-ui.cjs
           node tests/polish-ui.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Liftlog-1.3.2-Screen-Checks
+          name: Liftlog-1.4.0-Screen-Checks
           path: test-output/
   android-device-checks:
     needs: apk
@@ -90,7 +91,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: Liftlog-1.3.2-APK
+          name: Liftlog-1.4.0-APK
           path: dist
       - uses: actions/setup-java@v4
         with:
@@ -114,5 +115,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Liftlog-1.3.2-Android-Checks
+          name: Liftlog-1.4.0-Android-Checks
           path: test-output/

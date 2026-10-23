@@ -69,13 +69,13 @@ test('확장 운동 포함 백업 검증',"(()=>{const x=fresh();x.draft={id:'te
 // Elapsed time regression: a draft left for days must never become an 8000-minute workout.
 test('전체 시간 시분초 구분',"workoutClock(3661)==='01:01:01'&&workoutClock(61)==='00:01:01'");
 run("data=fresh();data.draft={id:'abandoned',date:dateKey(),name:'오래된 운동',notes:'메모',startedAt:Date.now()-8000*60000,exercises:[newExercise('bench')]};normalizeClock()");
-test('8000분 방치 기록 자동 확인',"data.draft.clock.paused&&data.draft.clock.needsReview&&workoutElapsedMs()===0");
+test('8000분 방치 기록 2시간 자동 제한',"data.draft.clock.paused&&data.draft.clock.limitReached&&!data.draft.clock.needsReview&&workoutElapsedMs()===WORKOUT_MAX_MS");
 test('오래된 진행 세트와 메모 보존',"data.draft.exercises[0].sets.length===3&&data.draft.notes==='메모'");
 run('data.draft.clock={...newClock(100000),elapsedMs:60000};checkpointClock(130000)');
 test('운동 시간 정확히 누적',"data.draft.clock.elapsedMs===90000&&workoutElapsedMs(data.draft,140000)===100000");
 run('data.draft.clock.paused=true');test('일시정지 중 시간 불변',"workoutElapsedMs(data.draft,800000)===90000");
-run('data.draft.clock={...newClock(100000),elapsedMs:60000,lastSeenMs:130000};normalizeClock(data.draft,100000+WORKOUT_IDLE_MS+100000)');
-test('재실행 긴 공백 시간 제외',"data.draft.clock.paused&&data.draft.clock.needsReview&&data.draft.clock.elapsedMs===90000");
+run('data.draft.clock={...newClock(100000),elapsedMs:60000,lastSeenMs:130000};normalizeClock(data.draft,100000+WORKOUT_MAX_MS+100000)');
+test('재실행 긴 공백도 2시간에서 자동 정지',"data.draft.clock.paused&&data.draft.clock.limitReached&&data.draft.clock.elapsedMs===WORKOUT_MAX_MS");
 test('과거 비정상 시간은 원본 보존하고 통계 제외',"(()=>{const s={duration:8000*3600};return reliableDuration(s)===0&&durationLabel(s)==='시간 확인 필요'&&s.duration===8000*3600})()");
 test('확인한 장시간 기록은 통계 반영',"reliableDuration({duration:13*3600,durationConfirmed:true})===13*3600");
 run("data=fresh();startWorkout(dateKey(),routines[0]);data.settings.exerciseRest={squat:120};actions.checkSet({dataset:{ex:'0',set:'0'},closest:()=>null})");
@@ -101,3 +101,33 @@ run("sessionDateSheet('date-edit');document.querySelector('#session-date').value
 run("document.querySelector('#session-date').value='2999-01-01';saveSessionDate()");test('미래 운동 날짜 거부',"data.sessions[0].date==='2026-09-14'&&modal==='sessionDate'");
 run("document.querySelector('#session-date').value='';saveSessionDate()");test('빈 날짜 거부',"data.sessions[0].date==='2026-09-14'");
 run("document.querySelector('#session-date').value='2026-09-15';loadError=true;saveSessionDate();loadError=false");test('저장 실패 시 원래 날짜 보존',"data.sessions[0].date==='2026-09-14'");
+
+// Two-hour cap across active use, pause/resume, reboot and saving.
+run("data=fresh();startWorkout(dateKey(),routines[0]);data.draft.clock=newClock(100000)");
+test('2시간 직전까지 정상 측정',"workoutElapsedMs(data.draft,100000+WORKOUT_MAX_MS-1)===WORKOUT_MAX_MS-1&&!data.draft.clock.paused");
+run("normalizeClock(data.draft,100000+WORKOUT_MAX_MS)");
+test('정확히 2시간에 자동 정지',"data.draft.clock.elapsedMs===WORKOUT_MAX_MS&&data.draft.clock.paused&&data.draft.clock.limitReached&&data.draft.clock.autoStoppedAt===100000+WORKOUT_MAX_MS");
+run("normalizeClock(data.draft,100000+86400000);normalizeClock(data.draft,100000+86400000)");
+test('다음 날에도 2시간과 자동 정지 시각 유지',"workoutElapsedMs(data.draft,100000+86400000)===WORKOUT_MAX_MS&&data.draft.clock.autoStoppedAt===100000+WORKOUT_MAX_MS");
+run("toggleWorkoutClock()");
+test('2시간 제한 후 이어하기로 초과 불가',"data.draft.clock.paused&&workoutElapsedMs()===WORKOUT_MAX_MS");
+run("data.draft.clock={...newClock(100000),elapsedMs:60000,paused:true};normalizeClock(data.draft,100000+86400000)");
+test('명시적 일시정지 시간은 누적하지 않음',"data.draft.clock.elapsedMs===60000&&!data.draft.clock.limitReached&&data.draft.clock.paused");
+run("data.draft.clock={...newClock(Date.now()),elapsedMs:WORKOUT_MAX_MS+100000,paused:true};normalizeClock()");
+test('이전 버전의 초과 시계도 2시간 제한',"data.draft.clock.elapsedMs===WORKOUT_MAX_MS&&data.draft.clock.limitReached");
+run("data.draft.exercises[0].notes='등을 패드에 고정';data.draft.exercises[0].sets[0].done=true;save();actions.saveWorkout()");
+test('자동 정지 후 세트와 메모 저장',"data.draft===null&&data.sessions[0].duration===7200&&data.sessions[0].exercises[0].notes==='등을 패드에 고정'&&data.sessions[0].exercises[0].sets[0].done");
+test('완료 메모 백업 검증',"validate(JSON.parse(localStorage.getItem('liftlog-v1'))).sessions[0].exercises[0].notes==='등을 패드에 고정'");
+test('형식이 잘못된 운동 메모 백업 거부',"(()=>{const x=JSON.parse(JSON.stringify(data));x.sessions[0].exercises[0].notes=42;try{validate(x);return false}catch(e){return true}})()");
+test('너무 긴 운동 메모 백업 거부',"(()=>{const x=JSON.parse(JSON.stringify(data));x.sessions[0].exercises[0].notes='가'.repeat(2001);try{validate(x);return false}catch(e){return true}})()");
+test('새 운동은 지난 메모를 덮어쓰지 않음',"newExercise(data.sessions[0].exercises[0].id).notes===''");
+run("const sourceId=data.sessions[0].id;importHistory(sourceId)");
+test('지난 운동 불러오기 메모 동반 보존',"data.draft.exercises[0].notes==='등을 패드에 고정'&&!data.draft.exercises[0].sets[0].done");
+run("data.draft.exercises[0].notes='현재 운동 메모';importHistory(data.sessions[0].id,'append')");
+test('지난 세트 추가 시 현재 메모 보존',"data.draft.exercises[0].notes==='현재 운동 메모'&&data.draft.exercises[0].sets.length===2");
+test('메모 HTML을 안전한 텍스트로 표시',"exerciseNoteText({notes:'<script>alert(1)</script>\\n두 번째 줄'}).includes('&lt;script&gt;')&&!exerciseNoteText({notes:'<script>'}).includes('<script>')");
+nodes.set('#clock-minutes',node());nodes.set('#clock-seconds',node());
+run("document.querySelector('#clock-minutes').value='120';document.querySelector('#clock-seconds').value='1'");
+test('2시간 1초 입력 거부',"Number.isNaN(readDuration('#clock-minutes','#clock-seconds',WORKOUT_MAX_MS/1000))");
+run("document.querySelector('#clock-seconds').value='0'");
+test('정확히 120분 입력 허용',"readDuration('#clock-minutes','#clock-seconds',WORKOUT_MAX_MS/1000)===7200");
