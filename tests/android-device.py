@@ -15,7 +15,7 @@ def wait(check,seconds=30):
   time.sleep(.5)
  raise AssertionError('Timed out waiting for device state')
 adb('install','-r','dist/Liftlog-1.4.0.apk')
-adb('shell','pm','grant','kr.liftlog.app','android.permission.POST_NOTIFICATIONS')
+adb('shell','pm','grant','kr.liftlog.app.next','android.permission.POST_NOTIFICATIONS')
 adb('shell','settings','put','secure','show_ime_with_hard_keyboard','1')
 print('Lock notification defaults:',adb('shell','settings','get','secure','lock_screen_show_notifications'),adb('shell','settings','get','secure','lock_screen_show_silent_notifications'),flush=True)
 adb('shell','settings','put','secure','lock_screen_show_notifications','1')
@@ -24,8 +24,8 @@ adb('shell','wm','size','720x1520')
 adb('shell','wm','density','320')
 adb('shell','am','start','-a','android.settings.SETTINGS')
 adb('shell','am','force-stop','com.android.launcher3')
-adb('shell','am','start','-n','kr.liftlog.app/.MainActivity')
-pid=wait(lambda:adb('shell','pidof','kr.liftlog.app'))
+adb('shell','am','start','-n','kr.liftlog.app.next/kr.liftlog.app.MainActivity')
+pid=wait(lambda:adb('shell','pidof','kr.liftlog.app.next'))
 wait(lambda:'webview_devtools_remote_'+pid in adb('shell','cat','/proc/net/unix'))
 adb('forward','tcp:9222','localabstract:webview_devtools_remote_'+pid)
 target=wait(lambda:json.load(urllib.request.urlopen('http://127.0.0.1:9222/json'))[0])
@@ -72,16 +72,16 @@ shot('android-keyboard-search.png');print('PASS actual Android keyboard keeps se
 adb('shell','input','keyevent','4');js("closeSheet();data.draft.exercises=[newExercise('bench')];page='workout';save();render();startTimer(90)")
 wait(lambda:'rest_countdown' in adb('shell','dumpsys','notification','--noredact'))
 notifications=adb('shell','dumpsys','notification','--noredact')
-assert 'kr.liftlog.app' in notifications and 'rest_countdown' in notifications
+assert 'kr.liftlog.app.next' in notifications and 'rest_countdown' in notifications
 assert js('Android.load().includes("timer")')
 adb('shell','cmd','statusbar','expand-notifications');time.sleep(2);shot('android-countdown-notification.png')
 adb('shell','cmd','statusbar','collapse');adb('shell','am','start','-a','android.settings.SETTINGS');time.sleep(3)
 # Confirm foreground timer survives leaving the activity.
-assert 'RestTimerService' in adb('shell','dumpsys','activity','services','kr.liftlog.app')
+assert 'RestTimerService' in adb('shell','dumpsys','activity','services','kr.liftlog.app.next')
 print('PASS native foreground countdown and custom notification while app is in background')
 adb('shell','locksettings','set-disabled','false');adb('shell','input','keyevent','26');time.sleep(2);adb('shell','input','keyevent','26');time.sleep(3);shot('android-lockscreen-countdown.png')
 # Verify notification skip reaches the app through the service broadcast.
-adb('shell','wm','dismiss-keyguard');adb('shell','am','start','-n','kr.liftlog.app/.MainActivity');time.sleep(1)
+adb('shell','wm','dismiss-keyguard');adb('shell','am','start','-n','kr.liftlog.app.next/kr.liftlog.app.MainActivity');time.sleep(1)
 adb('shell','cmd','statusbar','expand-notifications');time.sleep(1)
 def find_skip():
  result=adb('shell','uiautomator','dump','/sdcard/liftlog-notifications.xml')
@@ -104,3 +104,4 @@ else:
  print('PASS notification skip clears native storage and in-app rest timer',flush=True)
 (out/'android-native-verification.txt').write_text('PASS actual keyboard viewport\nPASS foreground timer notification in background\nNotification and lock-screen screenshots captured; display depends on device notification settings.\n')
 ws.close()
+

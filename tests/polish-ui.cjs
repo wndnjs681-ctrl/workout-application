@@ -26,10 +26,11 @@ const server=http.createServer((req,res)=>{const name=new URL(req.url,'http://lo
  assert.equal(await page.locator('#elapsed').innerText(),'02:00:00');assert.equal(await page.locator('.time-limit').count(),1);assert.equal(await page.locator('#exercise-note-0').inputValue(),'남겨 둔 종목 메모');assert.equal((await state()).draft.exercises[0].sets[0].weightKg,40);pass('밤새 방치한 기록도 2시간 자동 정지·세트와 메모 보존');
  await click('finish');assert.equal(await page.locator('#finish-minutes').inputValue(),'120');await page.fill('#finish-minutes','121');await click('saveWorkout');assert.equal((await state()).draft.id,'old');await page.fill('#finish-minutes','50');await click('saveWorkout');assert.equal((await state()).sessions.at(-1).duration,3000);pass('오래된 운동 실제 시간 확인 후 저장');
  // The cap also trips while the workout remains open, without discarding entered notes.
- await page.evaluate(()=>{startWorkout();data.draft.exercises=[newExercise('bench'),newExercise('squat')];data.draft.clock={...newClock(),elapsedMs:WORKOUT_MAX_MS-200};save();render()});
+ await page.evaluate(()=>{startWorkout(dateKey(),{name:'2시간 테스트',ids:['bench','squat']});data.draft.clock={...newClock(),elapsedMs:WORKOUT_MAX_MS-200};save();render()});
  await page.locator('#exercise-note-0').fill('벤치 메모');await page.locator('#exercise-note-1').fill('스쿼트 메모');await page.waitForTimeout(650);
  assert.equal(await page.locator('#elapsed').innerText(),'02:00:00');assert.equal(await page.locator('[data-action="toggleWorkoutClock"]').isDisabled(),true);assert.equal((await state()).draft.exercises[0].notes,'벤치 메모');assert.equal((await state()).draft.exercises[1].notes,'스쿼트 메모');pass('운동 중 2시간 자동 정지와 종목별 메모 분리');
  await page.reload();assert.equal(await page.locator('#elapsed').innerText(),'02:00:00');await page.locator('#exercise-note-1').fill('스쿼트 메모 수정');await page.evaluate(()=>window.scrollTo(0,0));await page.waitForTimeout(300);await page.screenshot({path:path.join(output,'notes-two-hour-cap.png'),fullPage:true});
  await click('checkSet');await click('finish');await click('saveWorkout');d=await state();assert.equal(d.sessions.at(-1).duration,7200);assert.equal(d.sessions.at(-1).exercises[0].notes,'벤치 메모');pass('자동 정지 후 120분과 메모 완료 저장');
  await page.setViewportSize({width:320,height:720});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=320));assert.deepEqual(errors,[]);pass('좁은 화면·브라우저 오류 검사');await browser.close();server.close();
 })().catch(e=>{console.error(e);server.close();process.exit(1)});
+
